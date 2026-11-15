@@ -1,0 +1,10 @@
+﻿field,meaning_zh,unit_or_scale,role,source_note
+MedInc,区域收入中位数,按数据来源尺度记录,feature,sklearn California Housing，1990人口普查街区组
+HouseAge,区域住房年龄中位数,年,feature,sklearn California Housing，1990人口普查街区组
+AveRooms,每户平均房间数,房间数/户,feature,sklearn California Housing，1990人口普查街区组
+AveBedrms,每户平均卧室数,卧室数/户,feature,sklearn California Housing，1990人口普查街区组
+Population,区域人口,人,feature,sklearn California Housing，1990人口普查街区组
+AveOccup,每户平均居住人数,人/户,feature,sklearn California Housing，1990人口普查街区组
+Latitude,区域纬度,度,feature,sklearn California Housing，1990人口普查街区组
+Longitude,区域经度,度,feature,sklearn California Housing，1990人口普查街区组
+MedHouseVal,区域住房价值中位数；一行不是一套房屋,十万美元,target,"20,640条；8个输入；由fetch_housing.py显式获取"

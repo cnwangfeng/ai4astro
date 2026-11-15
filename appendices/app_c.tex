@@ -1,0 +1,41 @@
+\chapter{sklearn 接口与可复现流程速查}
+\section{统一模型接口}
+scikit-learn是本书的机器学习软件包，Python导入名为\texttt{sklearn}。其中\textbf{估计器}是支持\texttt{fit}等统一操作的程序对象；它可以是预测模型，也可以是从数据学习处理规则的变换器。\textbf{接口}指调用对象的方法与参数约定，不代表各对象内部执行同一算法。下表是学过正文后的查询材料，不要求在第一章记住所有类名。
+
+sklearn 估计器通常通过 \texttt{fit(X, y)} 拟合，通过 \texttt{predict(X)} 预测。无监督方法可能只需 \texttt{fit(X)}，也可能提供 \texttt{fit\_predict(X)}。概率分类器常提供 \texttt{predict\_proba}，但不同模型并不一定具备这个接口。\texttt{score} 的默认定义随估计器类型变化，正式报告应直接调用明确命名的评价指标。
+\section{预处理与 Pipeline}
+标准化、填补、PCA 与模型组合时，使用 \texttt{Pipeline}。参数搜索把命名步骤与参数连接，例如 \texttt{clf\_\_C}。交叉验证中的每个训练折都应重新拟合整个流水线的可学习步骤。
+\section{常见模型与任务对照}
+\begin{longtable}{p{0.28\linewidth}p{0.35\linewidth}p{0.25\linewidth}}
+\toprule
+任务与方法&sklearn 类名&主要参数\\\midrule\endhead
+线性回归&\texttt{LinearRegression}&\texttt{fit\_intercept}\\
+Ridge/Lasso&\texttt{Ridge, Lasso}&\texttt{alpha}\\
+逻辑回归&\texttt{LogisticRegression}&\texttt{C, max\_iter}\\
+近邻分类&\texttt{KNeighborsClassifier}&\texttt{n\_neighbors}\\
+决策树&\texttt{DecisionTreeClassifier}&\texttt{max\_depth}\\
+随机森林&\texttt{RandomForestClassifier}&\texttt{n\_estimators}\\
+梯度提升回归&\texttt{GradientBoostingRegressor}&\texttt{learning\_rate}\\
+支持向量机&\texttt{SVC}&\texttt{C, gamma, kernel}\\
+多层感知机&\texttt{MLPClassifier}&\texttt{hidden\_layer\_sizes}\\
+降维&\texttt{PCA}&\texttt{n\_components}\\
+聚类&\texttt{KMeans, DBSCAN}&\texttt{n\_clusters, eps}\\
+异常检测&\texttt{IsolationForest}&\texttt{contamination}\\\bottomrule
+\end{longtable}
+\section{错误排查的推荐顺序}
+出现错误时先检查数据与模型接口：样本数是否一致；训练与预测字段顺序是否一致；是否包含字符串、无穷或缺失值；是否在训练折拟合变换；参数名是否适用于当前版本。其次检查统计问题：类别是否严重不平衡；特征是否泄漏目标；测试集是否参与模型选择；评价指标是否与任务目标相符。
+\section{独立验证的一个最小模板}
+\begin{lstlisting}[caption={保留数据与开发集交叉验证的骨架}]
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+X_dev, X_test, y_dev, y_test = train_test_split(
+    X, y, test_size=0.2, stratify=y, random_state=42)
+pipe = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))
+print(cross_val_score(pipe, X_dev, y_dev, cv=5).mean())
+# Holdout is used only after procedure and hyperparameters are fixed.
+\end{lstlisting}
+
+\input{appendices/appendixC}

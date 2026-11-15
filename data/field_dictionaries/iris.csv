@@ -1,0 +1,6 @@
+﻿field,meaning_zh,unit_or_scale,role,source_note
+sepal length (cm),萼片长度,cm,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+sepal width (cm),萼片宽度,cm,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+petal length (cm),花瓣长度,cm,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+petal width (cm),花瓣宽度,cm,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+target,物种类别：0=setosa;1=versicolor;2=virginica,类别编码；不是连续量,target,scikit-learn 官方数据说明；实际导出版本 1.8.0

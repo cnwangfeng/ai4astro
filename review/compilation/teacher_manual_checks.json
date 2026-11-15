@@ -1,0 +1,10 @@
+{
+  "pages": 25,
+  "overfull_boxes": 0,
+  "missing_glyphs": 0,
+  "undefined_references": 0,
+  "outside_page_blocks": [],
+  "rendered_with": "PyMuPDF",
+  "visual_review": "All main pages contact-sheet reviewed; selected dense pages and teacher pages enlarged. No clipping or overlap observed.",
+  "benign_warnings": "xeCJK font redefinition/VerbAddon notices and some underfull boxes; not a warning-free compile."
+}

@@ -1,0 +1,12 @@
+Python 3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]
+# Tested on Python 3.13.5 / Linux. Python is installed separately.
+numpy==2.3.5
+pandas==2.2.3
+scipy==1.17.0
+scikit-learn==1.8.0
+matplotlib==3.10.8
+nbformat==5.10.4
+nbclient==0.10.4
+ipykernel==7.2.0
+jupyterlab==4.5.3
+# XeLaTeX and latexmk are system tools. Optional: astropy, astroquery, xgboost.

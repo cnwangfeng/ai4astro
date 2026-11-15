@@ -1,0 +1,31 @@
+
+\section{从一行记录到一批记录的形状}
+单个对象的13项特征在数学上可以写成一个13维向量，但多数sklearn预测接口期望二维矩阵：行是样本，列是特征。因此一条新记录应组织为形状 $(1,13)$，而不是单纯长度13的数组。Pandas的 \texttt{df.iloc[[0]]}保留二维表，\texttt{df.iloc[0]}通常返回一维Series。理解这个区别，可以避免为了消除报错而随意转置。
+
+\begin{lstlisting}[caption={保持特征顺序和二维样本结构}]
+columns = list(X_train.columns)
+new_rows = incoming.loc[:, columns].copy()
+assert new_rows.shape[1] == X_train.shape[1]
+assert not new_rows.columns.duplicated().any()
+prediction = fitted_pipeline.predict(new_rows)
+\end{lstlisting}
+
+列名一致还不保证单位一致。若训练记录使用厘米，新记录使用毫米，需要先按字段规范转换，不能因为列名相同就认为输入可用。对于字符串标识，保持原样用于连接和结果追踪，不为了让所有列都是浮点而把标识一起转换。
+
+\section{检查连接关系与缺失来源}
+\texttt{merge}是按键连接两张表，不是简单按行位置拼接。若主表一个对象一行、辅助表同对象多行，连接会扩展记录数；这是合理的一对多关系还是不应有的重复，要由样本单位决定。
+\begin{lstlisting}[caption={给一对一连接设置显式约束}]
+assert main_table['source_id'].is_unique
+assert auxiliary['source_id'].is_unique
+joined = main_table.merge(auxiliary, on='source_id',
+                          how='left', validate='one_to_one',
+                          indicator=True)
+print(joined['_merge'].value_counts())
+\end{lstlisting}
+
+没有匹配上的值、原始测量本来缺失和读文件时把字符串解析失败，是三种不同来源。检查缺失时保留来源记录，避免把所有空值统一解释为“随机漏测”。写CSV时指定是否保留索引，读入后核对列名、类型和记录数；不要让自动生成的索引列意外进入模型。
+
+\section{Notebook的执行状态}
+Notebook允许任意顺序执行单元，这对探索方便，却可能让后面的结果依赖未保存的旧变量。提交前重启内核并从上到下运行，确认每个变量在使用前定义，每个输入来自说明过的文件或代码。图表输出应由当前源码生成，不保留已经不对应当前代码的旧结果。
+
+临时探索可以另存草稿；正式实验尽量把数据准备、配置、训练、评价和保存按顺序组织。错误消息先检查数据形状、类型、路径和接口参数，再考虑模型是否有统计问题。异常分数高与程序抛出异常并不是同一概念。

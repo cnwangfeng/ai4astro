@@ -1,0 +1,3 @@
+{'source': 'OGLE OCVS LMC fundamental-mode cepF.dat, first 90 records, four source fields', 'raw_rows': 90, 'usable_rows': 87, 'excluded_missing_I': 3, 'dev_n': 69, 'test_n': 18, 'selected': 'linear_log_period', 'test_rmse_mag': 0.14919339587341696, 'test_mae_mag': 0.12480396324480855, 'test_bias_mag': 0.05551889768001396, 'intercept': 16.902095076747, 'slope': -2.8805611804106284, 'period_min_days': 1.2629537, 'period_max_days': 28.3738735}
+
+STDERR

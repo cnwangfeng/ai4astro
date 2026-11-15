@@ -1,0 +1,22 @@
+\chapter{XGBoost 强化实验与后续学习建议}
+\section{从 sklearn 梯度提升到 XGBoost}
+第10章已经介绍逐轮增加弱学习器与负梯度的思想。XGBoost 是独立的软件库，支持 sklearn 风格的估计器接口，但并不属于 sklearn 核心安装。安装后可以用 \texttt{XGBClassifier} 或 \texttt{XGBRegressor} 进行有控制的对比；不同软件中的参数名称、默认值和停止条件应仔细核对。
+\begin{lstlisting}[caption={可选 XGBoost 分类模型骨架，需要另行安装 xgboost}]
+# pip install xgboost
+from xgboost import XGBClassifier
+model = XGBClassifier(n_estimators=150,
+                      max_depth=3,
+                      learning_rate=0.05,
+                      random_state=42,
+                      n_jobs=1)
+# Use the same development split and scoring rule as sklearn baselines.
+\end{lstlisting}
+教材不把运行时间差异或预测改进事先写成确定结论。实验应记录软件版本、硬件环境、样本规模和数据划分，避免只用一次运行推断普适性能。
+\section{通向深度学习的后续路径}
+\textbf{卷积网络}在图像邻域重复使用一组可学习权重，显式利用空间局部结构；\textbf{序列模型}处理有先后关系的输入；\textbf{注意力机制}根据当前输入学习怎样加权不同位置的信息。\textbf{预训练}是在较广的数据或任务上先学习模型，\textbf{微调}则是在已有模型基础上继续用目标任务的数据调整参数。这些是后续方向的简短定义，不是本书已完整讲授的算法。
+
+第12章 MLP 已介绍线性组合、非线性激活、反向传播和优化器。后续学习可依次关注：卷积网络怎样利用局部图像结构；序列模型怎样处理时间数据；注意力机制怎样建模不同位置之间的关系；大模型的预训练与微调怎样组织数据和训练信号。在物理与天文问题中，应根据任务与数据规模决定是否需要这些更复杂的模型。
+\section{推荐的继续实践}
+建议选择一个已完成的专业项目，在不改变数据划分的前提下加入新模型；与经典基线比较预测改善、资源成本、稳定性与科学解释，而不是另行寻找有利于新算法的样本筛选方案。对光谱、图像和时间序列等更复杂输入，应学习恰当的数据组织形式和针对对象的分组验证。
+
+\input{appendices/appendixF}

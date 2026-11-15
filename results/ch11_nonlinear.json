@@ -1,0 +1,4 @@
+{
+  "linear_training_accuracy": 0.5,
+  "rbf_training_accuracy": 1.0
+}

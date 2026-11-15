@@ -1,0 +1,4 @@
+reference_quantile,threshold,candidates,precision,recall,normal_false_positive_rate
+0.9,0.5503332546,40,0.5,1,0.1
+0.95,0.5920456331,29,0.6896551724,1,0.045
+0.99,0.6684621459,20,1,1,0

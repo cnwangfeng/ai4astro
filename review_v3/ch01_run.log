@@ -1,0 +1,5 @@
+                      rule  n_validation  correct
+         majority baseline            30       20
+prescribed petal threshold            30       30
+
+STDERR

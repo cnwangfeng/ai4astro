@@ -1,0 +1,587 @@
+{
+  "version": "3.0",
+  "date": "2026-11-15",
+  "software": {
+    "python": "3.13.5",
+    "scikit-learn": "1.8.0"
+  },
+  "policy": "Original, artificial, and externally fetched data are never substituted silently. Hashes identify bundled bytes, not external authenticity.",
+  "OGLE_extraction": {
+    "zero_based_source_rows": "0..89",
+    "fields": [
+      "source_id",
+      "I_mag",
+      "V_mag",
+      "period_days"
+    ],
+    "missing_symbol": "- converted to empty CSV cell",
+    "missing_I_source_rows": [
+      32,
+      67,
+      72
+    ],
+    "valid_rows": 87,
+    "development": 69,
+    "test": 18,
+    "validation_note": "Local alternate least-squares check, not a completed online source verification."
+  },
+  "files": [
+    {
+      "file": "data/ch03/batch_full_seeds.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "3d1de8f7964fa6e4b4aab77d6397d29730836a994397393be57d99dbb15c0a3e",
+      "bytes": 313,
+      "rows": 5,
+      "columns": [
+        "seed",
+        "loss",
+        "a_z",
+        "b_z"
+      ]
+    },
+    {
+      "file": "data/ch03/batch_full_trace.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "856d70091ba1d063a5d75721c1030997f5227bbb3c22a0dd282a7698629cbb98",
+      "bytes": 5667,
+      "rows": 81,
+      "columns": [
+        "step",
+        "sample_visits",
+        "epoch_passes",
+        "a",
+        "b",
+        "loss"
+      ]
+    },
+    {
+      "file": "data/ch03/batch_mini_seeds.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "1c57f3d85c7e19e0814ed23b4a14733390d177eb7fe201bc922b3194022a192a",
+      "bytes": 317,
+      "rows": 5,
+      "columns": [
+        "seed",
+        "loss",
+        "a_z",
+        "b_z"
+      ]
+    },
+    {
+      "file": "data/ch03/batch_mini_trace.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "d5e10778cef75b8e8737a32fdea85d2ec4f926932eaebb5bd43fc60da69b5449",
+      "bytes": 28436,
+      "rows": 401,
+      "columns": [
+        "step",
+        "sample_visits",
+        "epoch_passes",
+        "a",
+        "b",
+        "loss"
+      ]
+    },
+    {
+      "file": "data/ch03/batch_sgd_seeds.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "b8dddbb9bd3c8ac8049bdad71caac975b660fe2e8e238403e0cefe20cdb79427",
+      "bytes": 316,
+      "rows": 5,
+      "columns": [
+        "seed",
+        "loss",
+        "a_z",
+        "b_z"
+      ]
+    },
+    {
+      "file": "data/ch03/batch_sgd_trace.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "fff0d59734d035fb3db289282d0a1b143a0ff9d4af60a278b1d3a65416905377",
+      "bytes": 194112,
+      "rows": 2401,
+      "columns": [
+        "step",
+        "sample_visits",
+        "epoch_passes",
+        "a",
+        "b",
+        "loss"
+      ]
+    },
+    {
+      "file": "data/ch03/data_dictionary.txt",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "4c121ce5e45fc0858bb6f1e290acb42396681014334d4dcf051c32d7fe45ecee",
+      "bytes": 1864
+    },
+    {
+      "file": "data/ch03/line_data.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "37f13707675966ad9c357dfe3ac23203dac6ae1d4729a235683849087cc547c9",
+      "bytes": 2036,
+      "rows": 40,
+      "columns": [
+        "sample_id",
+        "x",
+        "y",
+        "split"
+      ]
+    },
+    {
+      "file": "data/ch03/linear_training_trace.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "257d49dd03ddaf206fcfe486cfeb830fb50f64adebb69defef34db7d014a38de",
+      "bytes": 7351,
+      "rows": 121,
+      "columns": [
+        "step",
+        "a",
+        "b",
+        "loss"
+      ]
+    },
+    {
+      "file": "data/ch03/regularization_demo.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "1ac8377798d6d3827a925ad2a795e1ee292443fbf9cdd32a82360e4dcf090454",
+      "bytes": 330,
+      "rows": 3,
+      "columns": [
+        "lambda",
+        "a",
+        "b",
+        "empirical_loss",
+        "penalty",
+        "objective"
+      ]
+    },
+    {
+      "file": "data/ch03/scalar_trajectories.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "68d40755e3d2d817849e8e64c7018b45da3d3124e4a65ea8cd3c22ab50788410",
+      "bytes": 1829,
+      "rows": 52,
+      "columns": [
+        "learning_rate",
+        "step",
+        "w",
+        "loss"
+      ]
+    },
+    {
+      "file": "data/ch03/scaling_large_original_lr.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "b3b255a181cd5b960e7c726360bdbbdb426b559617e18bb01d594d1fcd048b2f",
+      "bytes": 160,
+      "rows": 3,
+      "columns": [
+        "step",
+        "a",
+        "b",
+        "loss"
+      ]
+    },
+    {
+      "file": "data/ch03/scaling_large_small_lr.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "13d30d185471ab91f9fa0f60b5f7b45adcf9a97f250dd76e79c004d6a7310827",
+      "bytes": 7980,
+      "rows": 121,
+      "columns": [
+        "step",
+        "a",
+        "b",
+        "loss"
+      ]
+    },
+    {
+      "file": "data/ch03/scaling_standardized.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "fb1b164c7d2f89c1cce63536d48ff2ccb9b2c44cb8d0ae4284753bda0e0708f2",
+      "bytes": 7344,
+      "rows": 121,
+      "columns": [
+        "step",
+        "a",
+        "b",
+        "loss"
+      ]
+    },
+    {
+      "file": "data/diabetes.csv",
+      "kind": "public_standard_dataset",
+      "status": "included",
+      "sha256": "f16718c1e6602b419193b9a023dbe278ae7f85ff343158813d7040a9f7512dec",
+      "bytes": 95137,
+      "source": "scikit-learn 1.8.0 load_diabetes",
+      "rows": 442,
+      "columns": [
+        "age",
+        "sex",
+        "bmi",
+        "bp",
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+        "target"
+      ]
+    },
+    {
+      "file": "data/digits.csv",
+      "kind": "public_standard_dataset",
+      "status": "included",
+      "sha256": "59834b81e5525fe3152c7416217c7790c2213c0da554e89ae96dddef27b35bda",
+      "bytes": 495375,
+      "source": "scikit-learn 1.8.0 load_digits",
+      "rows": 1797,
+      "columns": [
+        "pixel_0_0",
+        "pixel_0_1",
+        "pixel_0_2",
+        "pixel_0_3",
+        "pixel_0_4",
+        "pixel_0_5",
+        "pixel_0_6",
+        "pixel_0_7",
+        "pixel_1_0",
+        "pixel_1_1",
+        "pixel_1_2",
+        "pixel_1_3",
+        "pixel_1_4",
+        "pixel_1_5",
+        "pixel_1_6",
+        "pixel_1_7",
+        "pixel_2_0",
+        "pixel_2_1",
+        "pixel_2_2",
+        "pixel_2_3",
+        "pixel_2_4",
+        "pixel_2_5",
+        "pixel_2_6",
+        "pixel_2_7",
+        "pixel_3_0",
+        "pixel_3_1",
+        "pixel_3_2",
+        "pixel_3_3",
+        "pixel_3_4",
+        "pixel_3_5",
+        "pixel_3_6",
+        "pixel_3_7",
+        "pixel_4_0",
+        "pixel_4_1",
+        "pixel_4_2",
+        "pixel_4_3",
+        "pixel_4_4",
+        "pixel_4_5",
+        "pixel_4_6",
+        "pixel_4_7",
+        "pixel_5_0",
+        "pixel_5_1",
+        "pixel_5_2",
+        "pixel_5_3",
+        "pixel_5_4",
+        "pixel_5_5",
+        "pixel_5_6",
+        "pixel_5_7",
+        "pixel_6_0",
+        "pixel_6_1",
+        "pixel_6_2",
+        "pixel_6_3",
+        "pixel_6_4",
+        "pixel_6_5",
+        "pixel_6_6",
+        "pixel_6_7",
+        "pixel_7_0",
+        "pixel_7_1",
+        "pixel_7_2",
+        "pixel_7_3",
+        "pixel_7_4",
+        "pixel_7_5",
+        "pixel_7_6",
+        "pixel_7_7",
+        "target"
+      ]
+    },
+    {
+      "file": "data/digits_split_v3.csv",
+      "kind": "derived_metadata",
+      "status": "included",
+      "sha256": "68fa0d7dea0eccfb2cef90e3f76b028081e438f5c16cc8dab0fc8efddd4e7f23",
+      "bytes": 26931,
+      "rows": 1797,
+      "columns": [
+        "row_id",
+        "role"
+      ]
+    },
+    {
+      "file": "data/field_dictionaries/california_housing.csv",
+      "kind": "derived_metadata",
+      "status": "included",
+      "sha256": "bbdf5fcee42daf5be0cd9b7f6bfab070e16b85070a334eac712b1dde9017027b",
+      "bytes": 1023,
+      "rows": 9,
+      "columns": [
+        "field",
+        "meaning_zh",
+        "unit_or_scale",
+        "role",
+        "source_note"
+      ]
+    },
+    {
+      "file": "data/field_dictionaries/diabetes.csv",
+      "kind": "public_standard_dataset",
+      "status": "included",
+      "sha256": "e99cd1fb84ce0ad25bbc7e22974cbe557c5c867fbb66c1e91a92e1bb09b783ff",
+      "bytes": 1968,
+      "source": "scikit-learn 1.8.0 load_diabetes",
+      "rows": 11,
+      "columns": [
+        "field",
+        "meaning_zh",
+        "unit_or_scale",
+        "role",
+        "source_note"
+      ]
+    },
+    {
+      "file": "data/field_dictionaries/digits.csv",
+      "kind": "public_standard_dataset",
+      "status": "included",
+      "sha256": "87f64bd7c88f027ef3f41e236e3204d0b10963299a809b5a2c98cc91775ab0ff",
+      "bytes": 8940,
+      "source": "scikit-learn 1.8.0 load_digits",
+      "rows": 65,
+      "columns": [
+        "field",
+        "meaning_zh",
+        "unit_or_scale",
+        "role",
+        "source_note"
+      ]
+    },
+    {
+      "file": "data/field_dictionaries/iris.csv",
+      "kind": "public_standard_dataset",
+      "status": "included",
+      "sha256": "544eab44e486f229d6612abdae3a9129abba78b82439ed6a56ba14ccee44f3d9",
+      "bytes": 612,
+      "source": "scikit-learn 1.8.0 load_iris",
+      "rows": 5,
+      "columns": [
+        "field",
+        "meaning_zh",
+        "unit_or_scale",
+        "role",
+        "source_note"
+      ]
+    },
+    {
+      "file": "data/field_dictionaries/wine.csv",
+      "kind": "public_standard_dataset",
+      "status": "included",
+      "sha256": "f79627c30255a2ecf7d74552a7baa8c5d79dae946c884863f79736d9891fd338",
+      "bytes": 2235,
+      "source": "scikit-learn 1.8.0 load_wine",
+      "rows": 14,
+      "columns": [
+        "field",
+        "meaning_zh",
+        "unit_or_scale",
+        "role",
+        "source_note"
+      ]
+    },
+    {
+      "file": "data/field_dictionary_template.csv",
+      "kind": "derived_metadata",
+      "status": "included",
+      "sha256": "1e4ba009ea8779c5e841212e3def4c604a920fd22bc8f0f69e067730c8fedbd0",
+      "bytes": 406,
+      "rows": 4,
+      "columns": [
+        "dataset",
+        "column",
+        "description",
+        "unit",
+        "role",
+        "dtype",
+        "missing_code",
+        "source"
+      ]
+    },
+    {
+      "file": "data/iris.csv",
+      "kind": "public_standard_dataset",
+      "status": "included",
+      "sha256": "0ba79ae755c686ee02dfe1d2943772a46ded2433c4fde6dd7ad3b01c41ff5d3d",
+      "bytes": 2777,
+      "source": "scikit-learn 1.8.0 load_iris",
+      "rows": 150,
+      "columns": [
+        "sepal length (cm)",
+        "sepal width (cm)",
+        "petal length (cm)",
+        "petal width (cm)",
+        "target"
+      ]
+    },
+    {
+      "file": "data/iris_split_v3.csv",
+      "kind": "derived_metadata",
+      "status": "included",
+      "sha256": "87127b63d5f78ba69f9a4b6693f74ae3cb720540e1fa15bc6e0ff27f95bea685",
+      "bytes": 2092,
+      "rows": 150,
+      "columns": [
+        "row_id",
+        "role"
+      ]
+    },
+    {
+      "file": "data/ogle_excerpt_split_v3.csv",
+      "kind": "derived_metadata",
+      "status": "included",
+      "sha256": "d1771620980612455fc1c3768094c27dfa62fe96a294618afc32d933a7585542",
+      "bytes": 2762,
+      "rows": 87,
+      "columns": [
+        "source_row",
+        "source_id",
+        "split"
+      ]
+    },
+    {
+      "file": "data/ogle_lmc_f_excerpt.csv",
+      "kind": "real_catalog_fixed_excerpt",
+      "status": "90 source rows transcribed from readable source; local numerical checks passed; full remote byte comparison not performed",
+      "sha256": "78dce8c1b962c1b012f9e9810c4f13a3084e316a688741990862a5de071870f8",
+      "bytes": 4053,
+      "source": "https://www.astrouw.edu.pl/ogle/ogle4/OCVS/lmc/cep/cepF.dat",
+      "rows": 90,
+      "columns": [
+        "source_row",
+        "source_id",
+        "I_mag",
+        "V_mag",
+        "period_days"
+      ]
+    },
+    {
+      "file": "data/simulated_calibration_project.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "cba55d0c51f6691bab4dd456103734c10e8ab33cd62b02007ecd2fd1570d276e",
+      "bytes": 44727,
+      "rows": 720,
+      "columns": [
+        "record_id",
+        "run_id",
+        "input_V",
+        "temperature_C",
+        "output_V"
+      ]
+    },
+    {
+      "file": "data/synthetic_anomaly_reference.npz",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "c00d0c4c85689b95723a34b3983aa815a624084c9b0835c6980695a3431d3a00",
+      "bytes": 12420
+    },
+    {
+      "file": "data/synthetic_moons.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "f6f5bed2b2e52112e55255b68a8d9286be7ab312453f66ae4ba527f146728af8",
+      "bytes": 16436,
+      "rows": 400,
+      "columns": [
+        "x1",
+        "x2",
+        "teaching_label"
+      ]
+    },
+    {
+      "file": "data/synthetic_response.csv",
+      "kind": "explicit_artificial_teaching_data",
+      "status": "included",
+      "sha256": "3359920f81178260aa098ba02c52848d2078182e32783cb95d8279dde2f8a527",
+      "bytes": 24323,
+      "rows": 300,
+      "columns": [
+        "row_id",
+        "x",
+        "u",
+        "target",
+        "latent_mean"
+      ]
+    },
+    {
+      "file": "data/wine.csv",
+      "kind": "public_standard_dataset",
+      "status": "included",
+      "sha256": "cd80158fad3d1e203d61dae42242620b02dd5f918e637b5f08381e39e7cf5204",
+      "bytes": 12261,
+      "source": "scikit-learn 1.8.0 load_wine",
+      "rows": 178,
+      "columns": [
+        "alcohol",
+        "malic_acid",
+        "ash",
+        "alcalinity_of_ash",
+        "magnesium",
+        "total_phenols",
+        "flavanoids",
+        "nonflavanoid_phenols",
+        "proanthocyanins",
+        "color_intensity",
+        "hue",
+        "od280/od315_of_diluted_wines",
+        "proline",
+        "target"
+      ]
+    },
+    {
+      "file": "data/wine_split_v3.csv",
+      "kind": "derived_metadata",
+      "status": "included",
+      "sha256": "f03e522e6ec8af9511642ee70a3dda491608f9f181cc1dc991e5aba8d560f20e",
+      "bytes": 2498,
+      "rows": 178,
+      "columns": [
+        "row_id",
+        "role"
+      ]
+    }
+  ],
+  "external_not_fully_executed": [
+    "California Housing full data",
+    "OGLE full catalog",
+    "SDSS",
+    "Gaia",
+    "Airfoil Self-Noise",
+    "Sonar",
+    "Superconductivity"
+  ]
+}

@@ -1,0 +1,11 @@
+ trees     mean      std
+    10 0.977778 0.023241
+    30 0.988889 0.015215
+   100 1.000000 0.000000
+   300 1.000000 0.000000
+    model  mean_accuracy  std_accuracy
+deep tree       0.922660      0.026106
+  bagging       0.950985      0.027849
+   forest       0.985961      0.017199
+
+STDERR

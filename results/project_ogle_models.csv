@@ -1,0 +1,4 @@
+model,cv_rmse,fold_sd
+constant,0.7523927258,0.1599790758
+linear_period,0.4200528718,0.110978659
+linear_log_period,0.2217141212,0.08816109728

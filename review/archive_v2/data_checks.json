@@ -1,0 +1,29 @@
+{
+  "sklearn": "1.8.0",
+  "results": [
+    {
+      "data": "iris",
+      "rows": 150,
+      "columns": 5,
+      "comparison": "PASS; float text roundtrip tolerance 1e-12"
+    },
+    {
+      "data": "wine",
+      "rows": 178,
+      "columns": 14,
+      "comparison": "PASS; float text roundtrip tolerance 1e-12"
+    },
+    {
+      "data": "digits",
+      "rows": 1797,
+      "columns": 65,
+      "comparison": "PASS; float text roundtrip tolerance 1e-12"
+    },
+    {
+      "data": "diabetes",
+      "rows": 442,
+      "columns": 11,
+      "comparison": "PASS; float text roundtrip tolerance 1e-12"
+    }
+  ]
+}

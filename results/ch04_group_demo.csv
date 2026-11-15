@@ -1,0 +1,11 @@
+split,fold,accuracy
+row split,1,1
+row split,2,1
+row split,3,1
+row split,4,1
+row split,5,1
+object split,1,0.6111111111
+object split,2,0.6666666667
+object split,3,0.5333333333
+object split,4,0.4444444444
+object split,5,0.5222222222

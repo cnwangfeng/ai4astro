@@ -1,0 +1,5 @@
+dataset,column,description,unit,role,dtype,missing_code,source
+example,source_id,Unique object identity,,id,string,,official source field
+example,feature_1,Input feature physical description,unit,input,float,NaN,official source field
+example,target,External reference target,unit,target,float,NaN,official source field
+example,group_id,Observing group / material batch,,group,string,,official source field

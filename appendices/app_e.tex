@@ -1,0 +1,27 @@
+\chapter{选学专题：高斯过程与预测不确定性}
+高斯过程回归（Gaussian process regression, GPR）是一种对函数进行概率建模的方法。在给定核函数及其参数和噪声模型后，可以对输入位置形成预测均值与模型假设条件下的不确定性估计。它适合某些中小样本的平滑函数建模，能够连接物理学生熟悉的插值与统计建模。
+\section{从相似输入到函数相关性}
+这里的\textbf{先验}描述看当前训练数据之前对函数形状的假设，\textbf{后验}则是在读入数据后对这些可能函数的更新。高斯过程规定：在任意有限组输入位置取出的函数值，服从一个多元高斯分布；均值函数描述平均水平，协方差函数描述不同位置的函数值怎样共同变化。\textbf{协方差}可视为对两量共同偏离各自均值的平均程度的描述，与第13章输入协方差的思想相通，但此处对象是函数值。
+
+预测均值是模型给出的中心估计，预测标准差描述给定模型假设下的分散程度。比如均值2、标准差0.3，不等于“任何真实测量都必然落在1.7到2.3内”；要把它转成区间还需要相应分布假设，并检查实际覆盖情况。
+
+核函数 $k(\mathbf x,\mathbf z)$ 描述不同输入位置对应函数值之间的先验相关性。常见 RBF 核随输入距离增加而衰减。选择核函数相当于引入对函数平滑程度、尺度和变化方式的假设。与第11章的核 SVM 不同，GPR 的输出包含与概率模型有关的预测方差，但这种方差必须连同模型假设解释。
+\section{最小 sklearn 实验}
+\begin{lstlisting}[caption={人工生成平滑函数的高斯过程回归示例}]
+import numpy as np
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import ConstantKernel, RBF, WhiteKernel
+rng = np.random.default_rng(42)
+X = np.linspace(0, 6, 30)[:, None]
+y = np.sin(X[:, 0]) + rng.normal(0, 0.1, len(X))
+kernel = ConstantKernel(1.0) * RBF(1.0) + WhiteKernel(0.02)
+reg = GaussianProcessRegressor(kernel=kernel, normalize_y=True,
+                               random_state=42).fit(X, y)
+xx = np.linspace(0, 6, 200)[:, None]
+mean, std = reg.predict(xx, return_std=True)
+\end{lstlisting}
+这里的样本由程序生成，不是天文或物理观测。实际项目可尝试小规模光变曲线或实验响应曲线，但应检查测量噪声、时间间隔、核假设及计算成本。核矩阵方法在样本数量较大时可能出现显著的存储与计算负担。
+\section{不同不确定性的区别}
+GPR 的预测标准差不是自动覆盖所有不确定性的万能数值。测量误差、核函数假设偏差、训练样本稀缺、分布变化和目标本身的随机性都应分别分析。学生应在图中标明区间是依据什么模型构造的，以及它是否得到独立数据的覆盖率验证。
+
+\input{appendices/appendixE}

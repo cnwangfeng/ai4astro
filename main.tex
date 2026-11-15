@@ -1,0 +1,95 @@
+\documentclass[UTF8,openany,11pt,a4paper]{ctexbook}
+\usepackage[margin=2.25cm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,amsthm,bm,mathtools}
+\usepackage{graphicx,booktabs,tabularx,longtable,multirow,array,calc}
+\usepackage{float,subcaption,caption,xcolor}
+\usepackage{xurl,hyperref,cleveref}
+\usepackage{fancyhdr,enumitem,listings}
+\usepackage{siunitx,etoolbox,tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
+\IfFontExistsTF{Noto Serif CJK SC}{\setCJKmainfont{Noto Serif CJK SC}[AutoFakeSlant=0.15]}{\setCJKmainfont{FandolSong-Regular}}
+\IfFontExistsTF{Noto Sans CJK SC}{\setCJKsansfont{Noto Sans CJK SC}}{\setCJKsansfont{FandolHei-Regular}}
+\IfFontExistsTF{Noto Sans Mono CJK SC}{\setCJKmonofont{Noto Sans Mono CJK SC}}{\setCJKmonofont{FandolFang-Regular}}
+\IfFontExistsTF{Linux Libertine O}{\setmainfont{Linux Libertine O}}{\setmainfont{TeX Gyre Termes}}
+\IfFontExistsTF{DejaVu Sans}{\setsansfont{DejaVu Sans}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{DejaVu Sans Mono}{\setmonofont{DejaVu Sans Mono}[Scale=0.83]}{\setmonofont{Latin Modern Mono}[Scale=0.83]}
+\definecolor{navy}{RGB}{22,52,83}
+\definecolor{teal}{RGB}{0,97,104}
+\definecolor{lightgray}{RGB}{245,247,249}
+\hypersetup{colorlinks=true,linkcolor=navy,urlcolor=teal,citecolor=teal,pdftitle={机器学习及其在天文与物理中的应用},pdfauthor={教材编写工作稿}}
+\sisetup{detect-all,output-decimal-marker={.}}
+\setlength{\emergencystretch}{2em}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{2.5pt plus 1pt}
+\linespread{1.20}
+\setlist{itemsep=1pt,topsep=3pt}
+\captionsetup{font=small,labelfont=bf}
+\lstset{language=Python,basicstyle=\ttfamily\small,keywordstyle=\color{navy}\bfseries,commentstyle=\color{teal},stringstyle=\color{red!55!black},breaklines=true,frame=single,rulecolor=\color{black!20},backgroundcolor=\color{lightgray},numbers=left,numberstyle=\tiny\color{black!45},showstringspaces=false,tabsize=4,columns=fullflexible,keepspaces=true,aboveskip=8pt,belowskip=8pt}
+\newcounter{worked}[chapter]
+\newcommand{\worked}[1]{\refstepcounter{worked}\subsubsection*{例\thechapter.\arabic{worked}\quad #1}}
+\BeforeBeginEnvironment{lstlisting}{\par\noindent\begin{minipage}{\linewidth}}
+\AfterEndEnvironment{lstlisting}{\end{minipage}\par}
+\newcommand{\keypoint}[1]{\par\noindent\textbf{核心理解：}#1\par}
+\newcommand{\scientificnote}[1]{\par\noindent\textbf{科学数据注意：}#1\par}
+\newcommand{\chaptergoal}[1]{\section*{本章学习目标}\addcontentsline{toc}{section}{本章学习目标}#1}
+\newcommand{\chapterpractice}[1]{\section*{本章实践与交付}\addcontentsline{toc}{section}{本章实践与交付}#1}
+\newcommand{\chapterexercise}{\section*{练习与讨论}\addcontentsline{toc}{section}{练习与讨论}}
+\newcommand{\fig}[3][0.83]{\begin{figure}[htbp]\centering\includegraphics[width=#1\linewidth]{figures/#2}\caption{#3}\end{figure}}
+\providecommand{\real}[1]{#1}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{1}
+\hypersetup{bookmarksdepth=2}
+\pagestyle{fancy}
+\fancyhf{}\fancyhead[LE,RO]{\small\nouppercase{\leftmark}}\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\raggedbottom
+\begin{document}
+\frontmatter
+\begin{titlepage}
+\centering\vspace*{4cm}
+{\sffamily\bfseries\Huge 机器学习及其在天文与物理中的应用\par}
+\vspace{1.1cm}{\Large 面向非计算机专业本科生的概念、经典算法与实践\par}
+\vspace{3cm}{\large 概念与案例教学修订版（17章，含图与实验）\par}
+\vspace{1cm}{\large 2026年11月\par}
+\vfill{\small 教材源文件采用 XeLaTeX；实验主线采用 Python、Pandas 与 scikit-learn。\par}
+\end{titlepage}
+\chapter*{前言}
+本书面向物理学、天文学及相关理科专业本科生。读者需要具备基础大学数学和Python编程知识，但不需要事先学过机器学习。我们从可以读懂的数据记录开始，逐步说明样本、特征、模型、训练与评价，再介绍不同算法怎样建立预测或发现结构。
+
+本书先用花的尺寸判断物种，用葡萄酒的化学测量区分类别，再利用区域住房记录学习数值预测。后面引入手写数字图像，以及天体目录和物理实验数据。每个数据集在第一次实际使用时介绍对象、字段和任务，英文名称用来对应数据来源与程序接口，不作为未经解释的先修知识。
+
+实验主要使用Python中的scikit-learn机器学习软件包，并用Pandas整理表格、NumPy进行数值计算、Matplotlib绘图。各工具在正文中随操作需要介绍。阅读顺序是先理解问题，再看一个小例子，接着理解公式，最后运行代码并解释结果。较长证明放在选学材料；必要概念、定义和算例不因减少推导而省略。
+
+本轮保留原有17章、119个编号小节和64学时框架，在入门叙述之上系统深化算法机制、必要推导、完整计算、反例与实验分析。分类树、概率模型、集成学习、核方法、神经网络、降维与聚类各自沿明确问题展开，不以相同字数替代深度。正文配套基础及深化习题、教师解答、源文件、数据说明和可运行实验。新增手算与模拟数据均明确标注；真实OGLE目录节选的分析与完整巡天研究分开说明。
+
+本书仍需进一步的独立学术审阅和课堂试教。当前版本的技术检查及尚未完成的事项列在工程的修订记录中；“程序通过”不等于已经证明每个教学环节适合所有学生。
+
+\tableofcontents
+\mainmatter
+\input{chapters/ch01}
+\input{chapters/ch02}
+\input{chapters/ch03}
+\input{chapters/ch04}
+\input{chapters/ch05}
+\input{chapters/ch06}
+\input{chapters/ch07}
+\input{chapters/ch08}
+\input{chapters/ch09}
+\input{chapters/ch10}
+\input{chapters/ch11}
+\input{chapters/ch12}
+\input{chapters/ch13}
+\input{chapters/ch14}
+\input{chapters/ch15}
+\input{chapters/ch16}
+\input{chapters/ch17}
+\appendix
+\input{appendices/app_a}
+\input{appendices/app_b}
+\input{appendices/app_c}
+\input{appendices/app_d}
+\input{appendices/app_e}
+\input{appendices/app_f}
+\backmatter
+\input{docs/references}
+\end{document}

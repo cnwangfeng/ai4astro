@@ -1,0 +1,5 @@
+parameter,analytic,finite_difference,updated
+w1,12,12,0.38
+b1,6,6,-0.06
+w2,2,2,2.98
+b2,2,2,-0.02

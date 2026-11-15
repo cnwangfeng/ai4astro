@@ -1,0 +1,6 @@
+{
+  "RMSE": 0.3447667386073492,
+  "percentile_2.5": 0.27613250023063896,
+  "percentile_97.5": 0.4248111632766469,
+  "scope": "fixed predictions, IID row resampling of synthetic validation sample"
+}

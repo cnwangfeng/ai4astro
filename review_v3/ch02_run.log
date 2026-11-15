@@ -1,0 +1,6 @@
+  feature  training_mean_raw  training_std_ddof0  training_mean_scaled  validation_mean_scaled
+  alcohol          12.934057            0.811024         -8.188222e-16                0.211713
+magnesium          98.877358           14.046891         -7.122185e-17                0.212414
+  proline         735.547170          298.048215          1.120697e-16                0.052033
+
+STDERR

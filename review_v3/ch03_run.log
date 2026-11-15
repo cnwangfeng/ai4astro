@@ -1,0 +1,5 @@
+component   analytic  finite_difference
+    slope -15.333333         -15.333333
+intercept  -6.666667          -6.666667
+
+STDERR

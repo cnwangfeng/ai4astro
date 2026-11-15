@@ -1,0 +1,15 @@
+﻿field,meaning_zh,unit_or_scale,role,source_note
+alcohol,酒精相关指标,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+malic_acid,苹果酸,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+ash,灰分,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+alcalinity_of_ash,灰分碱度,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+magnesium,镁,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+total_phenols,总酚,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+flavanoids,类黄酮,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+nonflavanoid_phenols,非类黄酮酚,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+proanthocyanins,原花青素,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+color_intensity,颜色强度,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+hue,色调,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+od280/od315_of_diluted_wines,稀释酒样在280/315纳米处的光密度比值,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+proline,脯氨酸,原始公开变量表未明确注明；不自行猜测,feature,UCI Wine 与 sklearn说明；原始类号1/2/3映射sklearn0/1/2
+target,三种葡萄栽培品种来源类号；计数59/71/48,"0,1,2；不是品质等级",target,scikit-learn 官方数据说明；实际导出版本 1.8.0

@@ -1,0 +1,5 @@
+{
+  "average_precision": 1.0,
+  "n_reference": 400,
+  "n_query": 220
+}

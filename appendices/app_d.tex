@@ -1,0 +1,17 @@
+\chapter{数据来源、字段与再分发原则}
+\section{随 scikit-learn 提供的数据}
+本附录供查找来源与字段，不替代正文首次教学介绍。鸢尾花是150朵花的尺寸和物种记录（第\ref{sec:iris-intro}节）；葡萄酒是178个化学测量样本及其类别（第\ref{sec:wine-intro}节）；手写数字是1797幅小型灰度图及数字标签（第\ref{sec:digits-intro}节）。加州住房记录的样本单位是区域，目标是区域住房价值中位数（第\ref{sec:housing-intro}节）。糖尿病进展数据只承担明确标出的离线回归辅助演示，不能替代住房或专业数据的实际结果。
+
+工程中的\path{data/dataset_guide.md}逐项记录数据背景、样本单位和任务；\path{data/field_dictionaries/}给出已导出标准数据的实际列名、含义与来源。单位未获数据源确认时明确写为未注明，不根据列名猜测单位。
+
+Iris、Wine 和 Digits 的主要特征与目标通过 \texttt{load\_iris}、\texttt{load\_wine} 和 \texttt{load\_digits} 获取。本工程的 \texttt{data/} 文件夹可包含从本机 sklearn 导出的 CSV，但每份数据应记录生成脚本、软件版本和原始接口。California Housing 通过 \texttt{fetch\_california\_housing} 在线获取并缓存，不等同于 sklearn 离线自带的小数据文件。
+\section{专业案例官方入口}
+OGLE 经典造父变星：\url{https://www.astrouw.edu.pl/ogle/ogle4/OCVS/lmc/cep/}。同一区域和脉动模式选择是教学数据包的重要前提。SDSS 数据与光谱分类：\url{https://www.sdss4.org/dr17/}。Gaia DR3 文档：\url{https://gea.esac.esa.int/archive/documentation/GDR3/}。相关专业数据不能仅因名称类似就视为与教材中的字段一致，应以实际下载表中的字段字典为准。
+
+UCI Airfoil Self-Noise：\url{https://archive.ics.uci.edu/dataset/291/airfoil+self-noise}，提供5个输入变量和声压级目标，共1503条记录。Sonar 回波：\url{https://archive.ics.uci.edu/dataset/151/connectionist+bench+sonar+mines+vs+rocks}，包含208条记录、60个数值特征。Superconductivity：\url{https://archive.ics.uci.edu/dataset/464/superconductivty+data}，项目使用前需核对字段、重复材料与许可信息。
+\section{字段字典建议内容}
+每个专业数据包应附 \texttt{data\_dictionary.csv}，至少包含 \texttt{column, description, unit, role, dtype, missing\_code, source} 等字段。\texttt{role} 可取标识、分组、质量、输入、目标、事后参考等分类。单独记录筛选与匹配脚本，并保留原始来源版本。敏感、限制再分发或需要署名的数据，应提供获取脚本而不是直接复制发布。
+\section{离线与在线工作的边界}
+本工程中可在离线环境直接运行的标准教学示例，主要基于 sklearn 的 Iris、Wine、Digits、Diabetes 和人工生成数据。California Housing 与专业数据获取通常需要网络及源站服务。当前文件包不声明已经下载、核对并重新分析全部外部天文/物理数据；教师应在正式试教前完成其可用性、字段、版本及许可检查。
+
+\input{appendices/appendixD}

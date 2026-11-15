@@ -1,0 +1,24 @@
+          model  fold  train_accuracy  validation_accuracy  balanced_accuracy
+       majority     1        0.398230             0.413793           0.333333
+       majority     2        0.398230             0.413793           0.333333
+       majority     3        0.403509             0.392857           0.333333
+       majority     4        0.403509             0.392857           0.333333
+       majority     5        0.403509             0.392857           0.333333
+scaled logistic     1        1.000000             1.000000           1.000000
+scaled logistic     2        1.000000             0.965517           0.972222
+scaled logistic     3        1.000000             1.000000           1.000000
+scaled logistic     4        1.000000             0.964286           0.969697
+scaled logistic     5        1.000000             0.964286           0.969697
+       split  fold  accuracy
+   row split     1  1.000000
+   row split     2  1.000000
+   row split     3  1.000000
+   row split     4  1.000000
+   row split     5  1.000000
+object split     1  0.611111
+object split     2  0.666667
+object split     3  0.533333
+object split     4  0.444444
+object split     5  0.522222
+
+STDERR

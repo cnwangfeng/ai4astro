@@ -1,0 +1,2256 @@
+{
+  "ch01_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第1章 机器学习的基本概念与任务\n\n## 先认识对象和任务\n鸢尾花数据集（Iris）记录150朵花的萼片长度、萼片宽度、花瓣长度和花瓣宽度，四列单位均为厘米。每行对应一朵花；目标是三个物种之一。程序用0、1、2标识类别，编号之间没有数量距离。数据和字段解释见正文1.2节，完整说明见 `data/dataset_guide.md`。\n\n## 本次要理解什么\n从具体记录理解样本、输入特征和类别标签。先认识数据；最后的教师演示展示训练与预测分别需要什么信息，暂不要求掌握分类算法。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n先读数据表，再给样本、特征和标签命名。`shape`按行数、列数返回两个整数，类别列不放入X。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_iris\nimport pandas as pd\niris = load_iris(as_frame=True)\nX = iris.data.copy()\ny = iris.target.copy()\ntable = X.copy()\ntable['species'] = y.map(dict(enumerate(iris.target_names)))\nprint(table.iloc[[0, 50, 100]].to_string(index=False))\nprint('输入表形状:', X.shape, '类别数:', y.nunique())\nprint('各物种记录数:', table['species'].value_counts().to_dict())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n去掉类别信息并不自动完成聚类，也不保证会恢复原有三种物种。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "# Hiding labels changes the information supplied to an algorithm.\nfeatures_only = table.drop(columns='species')\nassert features_only.shape == (150, 4)\nprint(features_only.head().to_string(index=False))\n# No classifier or clustering method has been trained in this cell.",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n这个演示选择决策树，即用一串条件判断确定类别的模型。教师演示中fit接收输入与标签，predict只接收输入；第8章再解释这棵小树如何学得规则。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.model_selection import train_test_split\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import accuracy_score\nX_train, X_val, y_train, y_val = train_test_split(\n    X, y, test_size=0.25, stratify=y, random_state=42)\nmodel = DecisionTreeClassifier(max_depth=2, random_state=42)\nmodel.fit(X_train, y_train)           # Features and reference classes are used.\npredicted = model.predict(X_val)     # Only features are passed for prediction.\nprint('验证准确率:', accuracy_score(y_val, predicted))\nprint(pd.DataFrame({'reference':y_val, 'prediction':predicted}).head())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 逐一指出三条花记录中的样本、特征和目标。\n2. 为什么标签0、1、2不能直接理解为大小？\n3. 训练、预测、评价分别使用哪些信息？\n4. 隐藏类别后，能够提出什么分析问题？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch01_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第1章 机器学习的基本概念与任务\n\n## 先认识对象和任务\n鸢尾花数据集（Iris）记录150朵花的萼片长度、萼片宽度、花瓣长度和花瓣宽度，四列单位均为厘米。每行对应一朵花；目标是三个物种之一。程序用0、1、2标识类别，编号之间没有数量距离。数据和字段解释见正文1.2节，完整说明见 `data/dataset_guide.md`。\n\n## 本次要理解什么\n从具体记录理解样本、输入特征和类别标签。先认识数据；最后的教师演示展示训练与预测分别需要什么信息，暂不要求掌握分类算法。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n先读数据表，再给样本、特征和标签命名。`shape`按行数、列数返回两个整数，类别列不放入X。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_iris\nimport pandas as pd\niris = load_iris(as_frame=True)\nX = iris.data.copy()\ny = iris.target.copy()\ntable = X.copy()\ntable['species'] = y.map(dict(enumerate(iris.target_names)))\nprint(table.iloc[[0, 50, 100]].to_string(index=False))\nprint('输入表形状:', X.shape, '类别数:', y.nunique())\nprint('各物种记录数:', table['species'].value_counts().to_dict())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n去掉类别信息并不自动完成聚类，也不保证会恢复原有三种物种。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "# Hiding labels changes the information supplied to an algorithm.\nfeatures_only = table.drop(columns='species')\nassert features_only.shape == (150, 4)\nprint(features_only.head().to_string(index=False))\n# No classifier or clustering method has been trained in this cell.",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n这个演示选择决策树，即用一串条件判断确定类别的模型。教师演示中fit接收输入与标签，predict只接收输入；第8章再解释这棵小树如何学得规则。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.model_selection import train_test_split\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import accuracy_score\nX_train, X_val, y_train, y_val = train_test_split(\n    X, y, test_size=0.25, stratify=y, random_state=42)\nmodel = DecisionTreeClassifier(max_depth=2, random_state=42)\nmodel.fit(X_train, y_train)           # Features and reference classes are used.\npredicted = model.predict(X_val)     # Only features are passed for prediction.\nprint('验证准确率:', accuracy_score(y_val, predicted))\nprint(pd.DataFrame({'reference':y_val, 'prediction':predicted}).head())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 逐一指出三条花记录中的样本、特征和目标。\n2. 为什么标签0、1、2不能直接理解为大小？\n3. 训练、预测、评价分别使用哪些信息？\n4. 隐藏类别后，能够提出什么分析问题？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch02_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第2章 数据表示、探索与准备\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n认识表格、缺失与尺度处理。先在小数表上算清变换，再对真实记录操作；不要求提前掌握分类器。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n先检查字段，不要求记住13个英文名称。完整中文说明在字段字典，数据索引不是预测输入。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nimport numpy as np\nimport pandas as pd\nw = load_wine(as_frame=True)\nX, y = w.data.copy(), w.target.copy()\nprint(X.head(3).to_string(index=False))\nprint('样本数、特征数:', X.shape)\nprint('类别计数:', y.value_counts().sort_index().to_dict())\nprint(X.describe().loc[['min','max','mean','std']].T.head(8))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n小数表演示学习训练均值/标准差并保持不变；缺失填补使用中位数，是另一个独立操作。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.preprocessing import StandardScaler\nfrom sklearn.impute import SimpleImputer\nsmall = np.array([[1.], [2.], [3.]])\nscaler = StandardScaler().fit(small)\nprint('训练均值和标准差:', scaler.mean_, scaler.scale_)\nprint('标准化训练值:', scaler.transform(small).ravel())\nprint('新值4按原参数变换:', scaler.transform([[4.]]).ravel())\nincomplete = np.array([[1.], [np.nan], [3.], [8.]])\nimputer = SimpleImputer(strategy='median').fit(incomplete)\nprint('中位数填补:', imputer.transform(incomplete).ravel())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n为了让例子可重复，只在训练副本中人工增加一个缺失；原葡萄酒数据并没有这个缺失。预处理流水线按顺序完成填补与标准化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.model_selection import train_test_split\nfrom sklearn.pipeline import make_pipeline\nX_train, X_val, y_train, y_val = train_test_split(\n    X, y, test_size=.2, stratify=y, random_state=42)\nX_train = X_train.copy()\nX_train.iloc[0, 0] = np.nan  # Artificially missing, not a defect in the source.\npreprocess = make_pipeline(SimpleImputer(strategy='median'), StandardScaler())\nZ_train = preprocess.fit_transform(X_train)\nZ_val = preprocess.transform(X_val)\nprint('处理后的形状:', Z_train.shape, Z_val.shape)\nprint('训练各列均值接近0:', np.max(np.abs(Z_train.mean(axis=0))))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 解释一行记录、DataFrame和Series的区别。\n2. 手算小数表标准化后均值，并解释为何新值不能重新拟合均值。\n3. 0与缺失值有什么不同？\n4. 为什么验证数据只能transform？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch02_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第2章 数据表示、探索与准备\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n认识表格、缺失与尺度处理。先在小数表上算清变换，再对真实记录操作；不要求提前掌握分类器。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n先检查字段，不要求记住13个英文名称。完整中文说明在字段字典，数据索引不是预测输入。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nimport numpy as np\nimport pandas as pd\nw = load_wine(as_frame=True)\nX, y = w.data.copy(), w.target.copy()\nprint(X.head(3).to_string(index=False))\nprint('样本数、特征数:', X.shape)\nprint('类别计数:', y.value_counts().sort_index().to_dict())\nprint(X.describe().loc[['min','max','mean','std']].T.head(8))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n小数表演示学习训练均值/标准差并保持不变；缺失填补使用中位数，是另一个独立操作。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.preprocessing import StandardScaler\nfrom sklearn.impute import SimpleImputer\nsmall = np.array([[1.], [2.], [3.]])\nscaler = StandardScaler().fit(small)\nprint('训练均值和标准差:', scaler.mean_, scaler.scale_)\nprint('标准化训练值:', scaler.transform(small).ravel())\nprint('新值4按原参数变换:', scaler.transform([[4.]]).ravel())\nincomplete = np.array([[1.], [np.nan], [3.], [8.]])\nimputer = SimpleImputer(strategy='median').fit(incomplete)\nprint('中位数填补:', imputer.transform(incomplete).ravel())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n为了让例子可重复，只在训练副本中人工增加一个缺失；原葡萄酒数据并没有这个缺失。预处理流水线按顺序完成填补与标准化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.model_selection import train_test_split\nfrom sklearn.pipeline import make_pipeline\nX_train, X_val, y_train, y_val = train_test_split(\n    X, y, test_size=.2, stratify=y, random_state=42)\nX_train = X_train.copy()\nX_train.iloc[0, 0] = np.nan  # Artificially missing, not a defect in the source.\npreprocess = make_pipeline(SimpleImputer(strategy='median'), StandardScaler())\nZ_train = preprocess.fit_transform(X_train)\nZ_val = preprocess.transform(X_val)\nprint('处理后的形状:', Z_train.shape, Z_val.shape)\nprint('训练各列均值接近0:', np.max(np.abs(Z_train.mean(axis=0))))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 解释一行记录、DataFrame和Series的区别。\n2. 手算小数表标准化后均值，并解释为何新值不能重新拟合均值。\n3. 0与缺失值有什么不同？\n4. 为什么验证数据只能transform？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch03_student.ipynb": {
+    "metadata": {
+      "chapter": "03",
+      "data_status": "synthetic",
+      "execution_verification": {
+        "all_cells_completed": true,
+        "code_cells": 9,
+        "method": "fresh Python process; sequential exec of code cells; no Jupyter kernel"
+      },
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python",
+        "version": "3.12.14"
+      }
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第3章 模型如何学习：损失函数与优化（学生版）\n\n本实验只研究**训练过程**。40条记录全部由程序人工生成，并非物理测量或天文观测。\n数据划分已经固定：30条训练记录用于本章；另外10条保留记录不参与计算或评价。\n`loss` 始终指训练数据上的**半均方误差**，不代表新样本预测能力。\n\n建议从本目录或上一层 `ch03` 目录启动。运行全部单元可得到完整基础流程。\n学生任务写在文字单元中，不会中断基础代码；请另加单元作答。\n目标是解释参数为何改变、学习率与特征尺度为何重要，以及一次更新和一轮数据遍历的差别。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 本实验的对象与概念起点\n本章的直线数据由程序人工生成，不是天文观测。每行是一对输入x和连续目标y；数据表中的split列只标记训练/保留角色，不能作为输入特征。共有40条记录，其中30条用于本章参数更新，10条保留。\n\n模型是y_hat=a*x+b，参数a、b控制斜率和截距。训练用损失衡量预测误差，再通过梯度和学习率决定更新方向与步长。下列实验依次观察预测、损失、梯度、参数更新，不要求事先知道这些词。先阅读正文3.1—3.5节，再逐单元运行。已有章内数据和实验数值保持不变。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from pathlib import Path\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn.preprocessing import StandardScaler\n\n# Find the original reviewed Chapter 3 CSVs in the complete textbook project.\nCANDIDATES = [\n    Path.cwd() / \"chapter03_material\",\n    Path.cwd(),\n    Path.cwd().parent / \"chapter03_material\",\n    Path.cwd().parent,\n]\nROOT = next((p for p in CANDIDATES if (p / \"data\" / \"line_data.csv\").exists()), None)\nif ROOT is None:\n    raise FileNotFoundError(\"Chapter 3 CSV not found; start Jupyter from the book project directory.\")\nplt.rcParams[\"axes.unicode_minus\"] = False",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 1. 先判断：数据、预测和参数\n\n读取数据前，请写出直线模型的输入、目标和两个可学习参数。\n读取后只选择 `split == 'train'`。`sample_id` 和 `split` 不作为预测特征。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "table = pd.read_csv(ROOT / \"data\" / \"line_data.csv\")\ntrain = table.loc[table[\"split\"].eq(\"train\")].copy()\nx = train[\"x\"].to_numpy()\ny = train[\"y\"].to_numpy()\nprint(\"训练样本数:\", len(train))\nprint(train.head().to_string(index=False))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "def half_mse(x, y, theta):\n    \"\"\"Training half mean squared error for theta=[slope, intercept].\"\"\"\n    prediction = theta[0] * x + theta[1]\n    return float(np.mean((prediction - y) ** 2) / 2)\n\ndef gradient(x, y, theta):\n    \"\"\"Both gradient components are computed at the same old theta.\"\"\"\n    error = theta[0] * x + theta[1] - y\n    return np.array([np.mean(error * x), np.mean(error)])\n\ndef gradient_descent(x, y, lr, steps, threshold=1e12):\n    \"\"\"Full batch GD; index 0 records initialization before any update.\"\"\"\n    theta = np.zeros(2, dtype=float)\n    rows = [{\"step\": 0, \"a\": 0.0, \"b\": 0.0,\n             \"loss\": half_mse(x, y, theta)}]\n    stop = \"maximum_updates\"\n    for step in range(1, steps + 1):\n        theta = theta - lr * gradient(x, y, theta)\n        loss = half_mse(x, y, theta)\n        rows.append({\"step\": step, \"a\": float(theta[0]),\n                     \"b\": float(theta[1]), \"loss\": loss})\n        if not np.isfinite(loss) or loss > threshold:\n            stop = \"divergence_guard\"\n            break\n    return pd.DataFrame(rows), stop",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 2. 单参数损失：方向与步长\n\n此处 $J(w)=(w-3)^2/2$ 是人为设置的示意目标，与直线CSV无关。\n从 $w=0$ 出发，先手算学习率0.5时的两次更新，再运行。\n比较0.1、0.5、1.5和2.1；记录哪些轨迹跨过了最小点，以及跨过后是否收敛。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "rates = [0.1, 0.5, 1.5, 2.1]\nscalar_records = []\nfor rate in rates:\n    w = 0.0\n    for step in range(13):\n        scalar_records.append({\"rate\": rate, \"step\": step,\n                               \"w\": w, \"loss\": (w - 3) ** 2 / 2})\n        w = w - rate * (w - 3)\nscalar = pd.DataFrame(scalar_records)\nprint(scalar.loc[(scalar[\"rate\"] == 0.5) & (scalar[\"step\"] <= 3)]\n      .to_string(index=False))\nfig, ax = plt.subplots(figsize=(7, 4))\nfor rate, group in scalar.groupby(\"rate\"):\n    ax.semilogy(group[\"step\"], group[\"loss\"], marker=\"o\", label=str(rate))\nax.set(xlabel=\"Parameter updates\", ylabel=\"Illustrative loss J(w)\")\nax.legend(title=\"Learning rate\")\nax.grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "**解释任务A**：为什么学习率1.5会左右交替，却仍接近最小点？\n把2.1改成2.0，先预测损失会怎样，再验证。不能把本题的学习率边界推广给所有目标函数。\n\n图例有四个学习率，但0.5和1.5的损失曲线完全重合：二者到最小点的距离每步都减半，\n仅参数偏差的符号变化不同。平方损失消除了符号，所以这不是漏画了一条曲线。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 3. 同时学习斜率和截距\n\n保持训练数据、初始参数和目标函数不变，采用全批量梯度下降。\n每次同时计算两个偏导，再同时更新两个参数。第0步尚未进行更新。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "history, stop_reason = gradient_descent(x, y, lr=0.2, steps=120)\nprint(history.loc[history[\"step\"].isin([0, 1, 5, 20, 120])]\n      .to_string(index=False))\nprint(\"停止原因:\", stop_reason)\nfig, axes = plt.subplots(1, 2, figsize=(11, 4))\naxes[0].scatter(x, y, s=25, color=\"black\", label=\"Synthetic train data\")\ngrid = np.linspace(x.min(), x.max(), 100)\nfor step in [0, 1, 5, 20, 120]:\n    row = history.loc[history[\"step\"].eq(step)].iloc[0]\n    axes[0].plot(grid, row[\"a\"] * grid + row[\"b\"], label=f\"step {step}\")\naxes[0].set(xlabel=\"x (dimensionless)\", ylabel=\"y (dimensionless)\")\naxes[0].legend(fontsize=8)\naxes[1].semilogy(history[\"step\"], history[\"loss\"])\naxes[1].set(xlabel=\"Parameter updates\", ylabel=\"Training half MSE\")\naxes[1].grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "least_squares = LinearRegression().fit(train[[\"x\"]], train[\"y\"])\nreference_theta = np.array([least_squares.coef_[0], least_squares.intercept_])\nfinal_theta = history[[\"a\", \"b\"]].iloc[-1].to_numpy()\nprint(\"梯度下降参数:\", final_theta)\nprint(\"最小二乘参数:\", reference_theta)\nprint(\"最小二乘训练半MSE:\", half_mse(x, y, reference_theta))\nprint(\"参数最大绝对差:\", np.max(np.abs(final_theta - reference_theta)))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "`LinearRegression` 在这里采用常规最小二乘数值求解；它不默认执行本实验的梯度下降循环。\n两种求解路径在同一目标上得到相近结果，有助于检查梯度实现。\n**解释任务B**：生成公式的斜率和截距是2.5与0.8，为什么拟合值不必恰好等于它们？\n为什么训练损失变小仍不能说明模型已经能处理新的观测？",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 4. 特征尺度：相同信息，不同更新过程\n\n把唯一特征改写成 `x_large = 1000 * x`，不要把x与x_large同时作为两列特征。\n标准化器只在训练记录上拟合。先预测直接沿用0.2学习率会发生什么。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "x_large = 1000.0 * x\nscale = StandardScaler().fit(x_large.reshape(-1, 1))\nz = scale.transform(x_large.reshape(-1, 1)).ravel()\nraw_fast, fast_stop = gradient_descent(x_large, y, 0.2, 120)\nraw_small, _ = gradient_descent(x_large, y, 1e-7, 120)\nstandardized, _ = gradient_descent(z, y, 0.2, 120)\nprint(\"大尺度、原学习率:\", raw_fast.tail(1).to_string(index=False), fast_stop)\nprint(\"大尺度、极小学习率:\", raw_small.tail(1).to_string(index=False))\nprint(\"标准化:\", standardized.tail(1).to_string(index=False))\naz, bz = standardized[[\"a\", \"b\"]].iloc[-1]\noriginal_a = 1000.0 * az / scale.scale_[0]\noriginal_b = bz - az * scale.mean_[0] / scale.scale_[0]\nprint(\"标准化模型换回原x坐标:\", original_a, original_b)\nfig, ax = plt.subplots(figsize=(7, 4))\nax.semilogy(raw_small[\"step\"], raw_small[\"loss\"], label=\"Large x, rate 1e-7\")\nax.semilogy(standardized[\"step\"], standardized[\"loss\"], label=\"Scaled x, rate 0.2\")\nax.set(xlabel=\"Parameter updates\", ylabel=\"Training half MSE\")\nax.legend()\nax.grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "损失超过$10^{12}$会触发保护性停止；这是发散保护，不是成功收敛。\n**解释任务C**：极小学习率下为什么可能很快学到大致斜率，但截距仍接近0？\n为什么直接比较标准化前后的斜率数字会产生误解？",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "def batch_descent(x, y, lr, epochs, batch_size, seed):\n    \"\"\"Same constant learning rate, with loss evaluated on all train rows.\n\n    Epochs have an equal number of sample visits, not equal update counts.\n    Loss evaluation itself is omitted from sample_visit accounting.\n    \"\"\"\n    n = len(x)\n    theta = np.zeros(2, dtype=float)\n    rng = np.random.default_rng(seed)\n    rows = [{\"step\": 0, \"sample_visits\": 0, \"epoch_passes\": 0.0,\n             \"a\": 0.0, \"b\": 0.0, \"loss\": half_mse(x, y, theta)}]\n    sample_visits = 0\n    step = 0\n    for epoch in range(epochs):\n        order = np.arange(n) if batch_size == n else rng.permutation(n)\n        for start in range(0, n, batch_size):\n            index = order[start:start + batch_size]\n            theta = theta - lr * gradient(x[index], y[index], theta)\n            sample_visits += len(index)\n            step += 1\n            rows.append({\"step\": step, \"sample_visits\": sample_visits,\n                         \"epoch_passes\": sample_visits / n,\n                         \"a\": float(theta[0]), \"b\": float(theta[1]),\n                         \"loss\": half_mse(x, y, theta)})\n    return pd.DataFrame(rows)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 5. 一次更新与一轮遍历\n\n使用同一训练标准化特征z、相同初值0、相同常数学习率0.1和80轮遍历。\n批量大小30、6、1分别对应每轮1、5、30次更新。这里控制的是样本遍历量，\n不是更新次数或运行时间。每个图中纵坐标都由全部30条训练记录计算。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "batch_histories = {}\nfor label, size in [(\"Full batch\", 30), (\"Mini batch\", 6), (\"SGD\", 1)]:\n    run = batch_descent(z, y, lr=0.1, epochs=80, batch_size=size, seed=42)\n    batch_histories[label] = run\n    print(label, run.tail(1).to_string(index=False))\nfig, axes = plt.subplots(1, 2, figsize=(11, 4))\nfor label, run in batch_histories.items():\n    axes[0].semilogy(run[\"epoch_passes\"], run[\"loss\"], label=label)\n    recent = run.loc[run[\"epoch_passes\"] >= 70]\n    axes[1].plot(recent[\"epoch_passes\"], recent[\"loss\"], label=label)\naxes[0].set(xlabel=\"Sample visits / training size\", ylabel=\"Training half MSE\")\naxes[1].set(xlabel=\"Sample visits / training size\", ylabel=\"Training half MSE\")\nfor ax in axes:\n    ax.legend(fontsize=8)\n    ax.grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "**解释任务D**：把随机种子改为0、1、2，比较末步结果。更换批量大小后，\n“80轮”为什么不再表示相同更新次数？观察随机更新的某一步使训练损失增加，\n能否立刻判断梯度代码错误？实验包含额外的全训练损失记录，不适合直接比较训练速度。\n\n## 6. 提交内容\n\n提交两步手算、直线参数更新记录、学习率与尺度对照图，并回答任务A—D。\n另用150—250字说明本章的停止条件、结果能支持的判断，以及尚未回答的泛化问题。\n保留训练/保留划分，不利用保留记录调学习率或做本章的模型评价。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch03_teacher.ipynb": {
+    "metadata": {
+      "chapter": "03",
+      "data_status": "synthetic",
+      "execution_verification": {
+        "all_cells_completed": true,
+        "code_cells": 10,
+        "method": "fresh Python process; sequential exec of code cells; no Jupyter kernel"
+      },
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python",
+        "version": "3.12.14"
+      }
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第3章 模型如何学习：损失函数与优化（教师版）\n\n本实验只研究**训练过程**。40条记录全部由程序人工生成，并非物理测量或天文观测。\n数据划分已经固定：30条训练记录用于本章；另外10条保留记录不参与计算或评价。\n`loss` 始终指训练数据上的**半均方误差**，不代表新样本预测能力。\n\n建议从本目录或上一层 `ch03` 目录启动。运行全部单元可得到完整基础流程。\n学生任务写在文字单元中，不会中断基础代码；请另加单元作答。\n目标是解释参数为何改变、学习率与特征尺度为何重要，以及一次更新和一轮数据遍历的差别。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 本实验的对象与概念起点\n本章的直线数据由程序人工生成，不是天文观测。每行是一对输入x和连续目标y；数据表中的split列只标记训练/保留角色，不能作为输入特征。共有40条记录，其中30条用于本章参数更新，10条保留。\n\n模型是y_hat=a*x+b，参数a、b控制斜率和截距。训练用损失衡量预测误差，再通过梯度和学习率决定更新方向与步长。下列实验依次观察预测、损失、梯度、参数更新，不要求事先知道这些词。先阅读正文3.1—3.5节，再逐单元运行。已有章内数据和实验数值保持不变。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from pathlib import Path\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn.preprocessing import StandardScaler\n\n# Find the original reviewed Chapter 3 CSVs in the complete textbook project.\nCANDIDATES = [\n    Path.cwd() / \"chapter03_material\",\n    Path.cwd(),\n    Path.cwd().parent / \"chapter03_material\",\n    Path.cwd().parent,\n]\nROOT = next((p for p in CANDIDATES if (p / \"data\" / \"line_data.csv\").exists()), None)\nif ROOT is None:\n    raise FileNotFoundError(\"Chapter 3 CSV not found; start Jupyter from the book project directory.\")\nplt.rcParams[\"axes.unicode_minus\"] = False",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 1. 先判断：数据、预测和参数\n\n读取数据前，请写出直线模型的输入、目标和两个可学习参数。\n读取后只选择 `split == 'train'`。`sample_id` 和 `split` 不作为预测特征。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "table = pd.read_csv(ROOT / \"data\" / \"line_data.csv\")\ntrain = table.loc[table[\"split\"].eq(\"train\")].copy()\nx = train[\"x\"].to_numpy()\ny = train[\"y\"].to_numpy()\nprint(\"训练样本数:\", len(train))\nprint(train.head().to_string(index=False))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "def half_mse(x, y, theta):\n    \"\"\"Training half mean squared error for theta=[slope, intercept].\"\"\"\n    prediction = theta[0] * x + theta[1]\n    return float(np.mean((prediction - y) ** 2) / 2)\n\ndef gradient(x, y, theta):\n    \"\"\"Both gradient components are computed at the same old theta.\"\"\"\n    error = theta[0] * x + theta[1] - y\n    return np.array([np.mean(error * x), np.mean(error)])\n\ndef gradient_descent(x, y, lr, steps, threshold=1e12):\n    \"\"\"Full batch GD; index 0 records initialization before any update.\"\"\"\n    theta = np.zeros(2, dtype=float)\n    rows = [{\"step\": 0, \"a\": 0.0, \"b\": 0.0,\n             \"loss\": half_mse(x, y, theta)}]\n    stop = \"maximum_updates\"\n    for step in range(1, steps + 1):\n        theta = theta - lr * gradient(x, y, theta)\n        loss = half_mse(x, y, theta)\n        rows.append({\"step\": step, \"a\": float(theta[0]),\n                     \"b\": float(theta[1]), \"loss\": loss})\n        if not np.isfinite(loss) or loss > threshold:\n            stop = \"divergence_guard\"\n            break\n    return pd.DataFrame(rows), stop",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 2. 单参数损失：方向与步长\n\n此处 $J(w)=(w-3)^2/2$ 是人为设置的示意目标，与直线CSV无关。\n从 $w=0$ 出发，先手算学习率0.5时的两次更新，再运行。\n比较0.1、0.5、1.5和2.1；记录哪些轨迹跨过了最小点，以及跨过后是否收敛。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "rates = [0.1, 0.5, 1.5, 2.1]\nscalar_records = []\nfor rate in rates:\n    w = 0.0\n    for step in range(13):\n        scalar_records.append({\"rate\": rate, \"step\": step,\n                               \"w\": w, \"loss\": (w - 3) ** 2 / 2})\n        w = w - rate * (w - 3)\nscalar = pd.DataFrame(scalar_records)\nprint(scalar.loc[(scalar[\"rate\"] == 0.5) & (scalar[\"step\"] <= 3)]\n      .to_string(index=False))\nfig, ax = plt.subplots(figsize=(7, 4))\nfor rate, group in scalar.groupby(\"rate\"):\n    ax.semilogy(group[\"step\"], group[\"loss\"], marker=\"o\", label=str(rate))\nax.set(xlabel=\"Parameter updates\", ylabel=\"Illustrative loss J(w)\")\nax.legend(title=\"Learning rate\")\nax.grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "**解释任务A**：为什么学习率1.5会左右交替，却仍接近最小点？\n把2.1改成2.0，先预测损失会怎样，再验证。不能把本题的学习率边界推广给所有目标函数。\n\n图例有四个学习率，但0.5和1.5的损失曲线完全重合：二者到最小点的距离每步都减半，\n仅参数偏差的符号变化不同。平方损失消除了符号，所以这不是漏画了一条曲线。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 3. 同时学习斜率和截距\n\n保持训练数据、初始参数和目标函数不变，采用全批量梯度下降。\n每次同时计算两个偏导，再同时更新两个参数。第0步尚未进行更新。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "history, stop_reason = gradient_descent(x, y, lr=0.2, steps=120)\nprint(history.loc[history[\"step\"].isin([0, 1, 5, 20, 120])]\n      .to_string(index=False))\nprint(\"停止原因:\", stop_reason)\nfig, axes = plt.subplots(1, 2, figsize=(11, 4))\naxes[0].scatter(x, y, s=25, color=\"black\", label=\"Synthetic train data\")\ngrid = np.linspace(x.min(), x.max(), 100)\nfor step in [0, 1, 5, 20, 120]:\n    row = history.loc[history[\"step\"].eq(step)].iloc[0]\n    axes[0].plot(grid, row[\"a\"] * grid + row[\"b\"], label=f\"step {step}\")\naxes[0].set(xlabel=\"x (dimensionless)\", ylabel=\"y (dimensionless)\")\naxes[0].legend(fontsize=8)\naxes[1].semilogy(history[\"step\"], history[\"loss\"])\naxes[1].set(xlabel=\"Parameter updates\", ylabel=\"Training half MSE\")\naxes[1].grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "least_squares = LinearRegression().fit(train[[\"x\"]], train[\"y\"])\nreference_theta = np.array([least_squares.coef_[0], least_squares.intercept_])\nfinal_theta = history[[\"a\", \"b\"]].iloc[-1].to_numpy()\nprint(\"梯度下降参数:\", final_theta)\nprint(\"最小二乘参数:\", reference_theta)\nprint(\"最小二乘训练半MSE:\", half_mse(x, y, reference_theta))\nprint(\"参数最大绝对差:\", np.max(np.abs(final_theta - reference_theta)))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "`LinearRegression` 在这里采用常规最小二乘数值求解；它不默认执行本实验的梯度下降循环。\n两种求解路径在同一目标上得到相近结果，有助于检查梯度实现。\n**解释任务B**：生成公式的斜率和截距是2.5与0.8，为什么拟合值不必恰好等于它们？\n为什么训练损失变小仍不能说明模型已经能处理新的观测？",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 4. 特征尺度：相同信息，不同更新过程\n\n把唯一特征改写成 `x_large = 1000 * x`，不要把x与x_large同时作为两列特征。\n标准化器只在训练记录上拟合。先预测直接沿用0.2学习率会发生什么。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "x_large = 1000.0 * x\nscale = StandardScaler().fit(x_large.reshape(-1, 1))\nz = scale.transform(x_large.reshape(-1, 1)).ravel()\nraw_fast, fast_stop = gradient_descent(x_large, y, 0.2, 120)\nraw_small, _ = gradient_descent(x_large, y, 1e-7, 120)\nstandardized, _ = gradient_descent(z, y, 0.2, 120)\nprint(\"大尺度、原学习率:\", raw_fast.tail(1).to_string(index=False), fast_stop)\nprint(\"大尺度、极小学习率:\", raw_small.tail(1).to_string(index=False))\nprint(\"标准化:\", standardized.tail(1).to_string(index=False))\naz, bz = standardized[[\"a\", \"b\"]].iloc[-1]\noriginal_a = 1000.0 * az / scale.scale_[0]\noriginal_b = bz - az * scale.mean_[0] / scale.scale_[0]\nprint(\"标准化模型换回原x坐标:\", original_a, original_b)\nfig, ax = plt.subplots(figsize=(7, 4))\nax.semilogy(raw_small[\"step\"], raw_small[\"loss\"], label=\"Large x, rate 1e-7\")\nax.semilogy(standardized[\"step\"], standardized[\"loss\"], label=\"Scaled x, rate 0.2\")\nax.set(xlabel=\"Parameter updates\", ylabel=\"Training half MSE\")\nax.legend()\nax.grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "损失超过$10^{12}$会触发保护性停止；这是发散保护，不是成功收敛。\n**解释任务C**：极小学习率下为什么可能很快学到大致斜率，但截距仍接近0？\n为什么直接比较标准化前后的斜率数字会产生误解？",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "def batch_descent(x, y, lr, epochs, batch_size, seed):\n    \"\"\"Same constant learning rate, with loss evaluated on all train rows.\n\n    Epochs have an equal number of sample visits, not equal update counts.\n    Loss evaluation itself is omitted from sample_visit accounting.\n    \"\"\"\n    n = len(x)\n    theta = np.zeros(2, dtype=float)\n    rng = np.random.default_rng(seed)\n    rows = [{\"step\": 0, \"sample_visits\": 0, \"epoch_passes\": 0.0,\n             \"a\": 0.0, \"b\": 0.0, \"loss\": half_mse(x, y, theta)}]\n    sample_visits = 0\n    step = 0\n    for epoch in range(epochs):\n        order = np.arange(n) if batch_size == n else rng.permutation(n)\n        for start in range(0, n, batch_size):\n            index = order[start:start + batch_size]\n            theta = theta - lr * gradient(x[index], y[index], theta)\n            sample_visits += len(index)\n            step += 1\n            rows.append({\"step\": step, \"sample_visits\": sample_visits,\n                         \"epoch_passes\": sample_visits / n,\n                         \"a\": float(theta[0]), \"b\": float(theta[1]),\n                         \"loss\": half_mse(x, y, theta)})\n    return pd.DataFrame(rows)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 5. 一次更新与一轮遍历\n\n使用同一训练标准化特征z、相同初值0、相同常数学习率0.1和80轮遍历。\n批量大小30、6、1分别对应每轮1、5、30次更新。这里控制的是样本遍历量，\n不是更新次数或运行时间。每个图中纵坐标都由全部30条训练记录计算。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "batch_histories = {}\nfor label, size in [(\"Full batch\", 30), (\"Mini batch\", 6), (\"SGD\", 1)]:\n    run = batch_descent(z, y, lr=0.1, epochs=80, batch_size=size, seed=42)\n    batch_histories[label] = run\n    print(label, run.tail(1).to_string(index=False))\nfig, axes = plt.subplots(1, 2, figsize=(11, 4))\nfor label, run in batch_histories.items():\n    axes[0].semilogy(run[\"epoch_passes\"], run[\"loss\"], label=label)\n    recent = run.loc[run[\"epoch_passes\"] >= 70]\n    axes[1].plot(recent[\"epoch_passes\"], recent[\"loss\"], label=label)\naxes[0].set(xlabel=\"Sample visits / training size\", ylabel=\"Training half MSE\")\naxes[1].set(xlabel=\"Sample visits / training size\", ylabel=\"Training half MSE\")\nfor ax in axes:\n    ax.legend(fontsize=8)\n    ax.grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "**解释任务D**：把随机种子改为0、1、2，比较末步结果。更换批量大小后，\n“80轮”为什么不再表示相同更新次数？观察随机更新的某一步使训练损失增加，\n能否立刻判断梯度代码错误？实验包含额外的全训练损失记录，不适合直接比较训练速度。\n\n## 6. 提交内容\n\n提交两步手算、直线参数更新记录、学习率与尺度对照图，并回答任务A—D。\n另用150—250字说明本章的停止条件、结果能支持的判断，以及尚未回答的泛化问题。\n保留训练/保留划分，不利用保留记录调学习率或做本章的模型评价。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师参考：解释任务\n\n**A**：误差满足$w_{t+1}-3=(1-\\eta)(w_t-3)$。\n1.5对应倍率-0.5，符号交替而绝对值缩小；2.0对应-1，幅度不变；\n2.1对应-1.1，幅度增大。这个边界只针对本题二次函数。\n\n**B**：本次训练最小二乘解约为a=2.506900、b=0.853364，\n训练半MSE=0.026641。有限样本含随机噪声，训练最优值不等于生成参数。\n未接触的数据、划分方式和评价指标将在第4章讨论；训练目标下降不能替代这项评价。\n\n**C**：放大输入使斜率方向的梯度与曲率显著变大。为保证该方向稳定而选择极小学习率，\n会使截距方向更新缓慢。本次120步极小学习率的截距为\n0.00001035，训练半MSE仍为\n0.386909。\n标准化后的斜率对应z而非x，必须先按给定公式换回原坐标才可比较。\n\n**D**：30条训练记录对应每轮全批量1次、小批量5次、随机30次更新；80轮分别80、400、2400次。\n小批量梯度由局部样本决定，不保证每次都减小全部训练记录的损失。\n固定常数学习率时，最优值附近仍可能有波动；不同排列带来不同末步结果。\n不应从单个种子给出普遍排名。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师扩展：逐轮减小学习率\n\n下例只改变随机梯度的学习率日程，以相同顺序与常数0.1比较。\n此例用于解释后期波动，不根据保留集选择日程。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "def scheduled_sgd(x, y, epochs=80, seed=42):\n    theta = np.zeros(2)\n    rng = np.random.default_rng(seed)\n    records = []\n    for epoch in range(epochs):\n        rate = 0.1 / (1.0 + epoch / 10.0)\n        for index in rng.permutation(len(x)):\n            theta -= rate * gradient(x[index:index + 1],\n                                     y[index:index + 1], theta)\n        records.append({\"epoch\": epoch + 1, \"rate\": rate,\n                        \"loss\": half_mse(x, y, theta)})\n    return pd.DataFrame(records)\nscheduled = scheduled_sgd(z, y)\nfixed = batch_histories[\"SGD\"]\nfixed_epoch = fixed.loc[(fixed[\"step\"] % len(z) == 0)\n                        & fixed[\"epoch_passes\"].between(60, 80)]\nscheduled_window = scheduled.loc[scheduled[\"epoch\"].between(60, 80)]\nprint(scheduled.tail().to_string(index=False))\nfig, ax = plt.subplots(figsize=(7, 4))\nax.plot(fixed_epoch[\"epoch_passes\"], fixed_epoch[\"loss\"], label=\"Constant rate\")\nax.plot(scheduled_window[\"epoch\"], scheduled_window[\"loss\"],\n        label=\"Decreasing rate\")\nax.set(xlim=(60, 80), xlabel=\"Epoch\", ylabel=\"Training half MSE\")\nax.legend()\nax.grid(alpha=0.2)\nplt.show()",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 正文习题参考答案\n\n1. 对直线模型，x是输入、y是监督目标，ŷ是预测，a和b是模型参数。学习率、批量大小、\n最大更新次数和正则化强度是训练前设置的超参数。学习率0.2改为0.02改变优化过程，\n直线改为二次曲线则改变模型表达与参数集合。样本ID不作输入。\n2. 三点例子的残差为1、0、-1，平均残差为0，MSE为2/3，半均方误差为1/3；正负抵消掩盖误差。\n在a=1、b=1时梯度为(-2/3,0)。学习率0.3更新后a=1.2、b=1，\n半均方误差为0.64/3，约0.213333。\n3. 示意损失中从0出发、学习率0.5时w1=1.5、w2=2.25，损失分别1.125和0.28125。\n学习率2.0时w在0和6之间交替，损失始终4.5。\n4. 使用已更新的a计算b的梯度不再是本章定义的同步全梯度更新；应先算完整梯度向量。\n即使某次仍下降，也不能据此说程序实现了同一种更新规则。\n5. 30条样本、80轮，三种批量大小30、6、1对应80、400、2400次更新和相同2400次样本访问。\n若某数据集样本数不能被批量大小整除，应保留末尾较小批次并按其实际大小取平均。\n6. 尺度实验参考任务C。仅将步数增加不能保证挽救过大学习率造成的发散；\n标准化要在训练数据上学习统计量，再用于其他数据。\n7. 改变打乱种子会改变随机/小批量的参数轨迹。应报告固定的比较条件和多个种子的结果，\n不挑选最好的一次。全批量在本程序里不依赖排列。\n8. 开放题，答案不唯一。例如传感器标定：样本为特定工况的一次读数，x为参考输入信号，\ny为传感器输出，可在有限量程内先尝试ŷ=ax+b。需检查量程、系统偏差、重复读数相关性、\n测量不确定性、异常记录和划分，再评价新条件下的预测。训练直线与已知物理公式形似，\n不足以验证机制；残差结构和外推范围仍需检查。\n\n### 常见课堂问题\n\n学生把1e12保护停止称作收敛时，先让其比较初始与末步损失；把标准化斜率直接与2.5比较时，\n让其写出z和x的关系；把训练曲线称作测试结果时，要求指出哪一行代码使用了新样本。\n不要求学生从零推导矩阵求导，也不在本章引入MLP反向传播的链式计算。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch04_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第4章 模型评价、选择与泛化\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n先手算评价指标，再比较只猜多数类的基线与逻辑回归。模型内部机制将在第6章解释，本章关注怎样组织评价。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n先不运行代码，自己统计TP、FP、FN、TN，再看数值。回归例子需要同时报告目标单位。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score\ntruth = [1,1,1,1,0,0,0,0,0,0]\npred =  [1,1,1,0,1,1,0,0,0,0]\nprint('行是真实类别、列是预测类别:\\n', confusion_matrix(truth, pred, labels=[0,1]))\nprint('accuracy, precision, recall, F1:',\n      accuracy_score(truth,pred), precision_score(truth,pred),\n      recall_score(truth,pred), f1_score(truth,pred))\nfrom sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score\nprint('MAE, RMSE, R2:', mean_absolute_error([2,4,6],[3,4,5]),\n      root_mean_squared_error([2,4,6],[3,4,5]), r2_score([2,4,6],[3,4,5]))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n基线模型只预测训练折中最多的类别；逻辑回归在每折只用对应训练数据拟合标准化和模型参数。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.model_selection import train_test_split,StratifiedKFold,cross_validate\nfrom sklearn.dummy import DummyClassifier\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.pipeline import make_pipeline\nw=load_wine(as_frame=True)\nX_dev,X_test,y_dev,y_test=train_test_split(w.data,w.target,stratify=w.target,\n                                            test_size=.2,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nmodels={'dummy':DummyClassifier(strategy='most_frequent'),\n        'logistic':make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000))}\nfor name,model in models.items():\n    r=cross_validate(model,X_dev,y_dev,cv=cv)\n    print(name,r['test_score'].mean(),r['test_score'].std())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n日常调参不查看X_test；第17章说明一次最终评价，但长期复用过的数据不能宣称对研究者完全未知。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "# We do NOT evaluate X_test here. It is reserved until a final project protocol.\nprint('开发样本数:', len(X_dev), '封存样本数:', len(X_test))\nprint('cross_validate 的 test_score 指每折验证分数，不是这里封存测试集的分数。')",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 手算混淆矩阵并解释假阳性与假阴性。\n2. 交叉验证中每折test_score和封存测试集有什么不同？\n3. 训练误差下降是否一定改善泛化？\n4. 为什么需要多数类基线？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch04_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第4章 模型评价、选择与泛化\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n先手算评价指标，再比较只猜多数类的基线与逻辑回归。模型内部机制将在第6章解释，本章关注怎样组织评价。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n先不运行代码，自己统计TP、FP、FN、TN，再看数值。回归例子需要同时报告目标单位。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score\ntruth = [1,1,1,1,0,0,0,0,0,0]\npred =  [1,1,1,0,1,1,0,0,0,0]\nprint('行是真实类别、列是预测类别:\\n', confusion_matrix(truth, pred, labels=[0,1]))\nprint('accuracy, precision, recall, F1:',\n      accuracy_score(truth,pred), precision_score(truth,pred),\n      recall_score(truth,pred), f1_score(truth,pred))\nfrom sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score\nprint('MAE, RMSE, R2:', mean_absolute_error([2,4,6],[3,4,5]),\n      root_mean_squared_error([2,4,6],[3,4,5]), r2_score([2,4,6],[3,4,5]))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n基线模型只预测训练折中最多的类别；逻辑回归在每折只用对应训练数据拟合标准化和模型参数。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.model_selection import train_test_split,StratifiedKFold,cross_validate\nfrom sklearn.dummy import DummyClassifier\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.pipeline import make_pipeline\nw=load_wine(as_frame=True)\nX_dev,X_test,y_dev,y_test=train_test_split(w.data,w.target,stratify=w.target,\n                                            test_size=.2,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nmodels={'dummy':DummyClassifier(strategy='most_frequent'),\n        'logistic':make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000))}\nfor name,model in models.items():\n    r=cross_validate(model,X_dev,y_dev,cv=cv)\n    print(name,r['test_score'].mean(),r['test_score'].std())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n日常调参不查看X_test；第17章说明一次最终评价，但长期复用过的数据不能宣称对研究者完全未知。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "# We do NOT evaluate X_test here. It is reserved until a final project protocol.\nprint('开发样本数:', len(X_dev), '封存样本数:', len(X_test))\nprint('cross_validate 的 test_score 指每折验证分数，不是这里封存测试集的分数。')",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 手算混淆矩阵并解释假阳性与假阴性。\n2. 交叉验证中每折test_score和封存测试集有什么不同？\n3. 训练误差下降是否一定改善泛化？\n4. 为什么需要多数类基线？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch05_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第5章 线性回归与正则化\n\n## 先认识对象和任务\n主案例是加州住房数据（California Housing）：1990年人口普查街区组的8项区域统计量，目标是区域住房价值中位数，单位为十万美元；一行不是一套房屋。首次使用需要下载，完整字段见正文5.1节。\n\n糖尿病随访数据（Diabetes）是一个明确命名的辅助回归案例：442名受试者的10项基线测量与一年后的疾病进展数值目标。默认特征已由来源作尺度处理，不是直接的原始化验单位。本例只演示回归计算，不作医学判断，也不把它称为住房数据。见正文5.6节。\n\n## 本次要理解什么\n先核对三点直线拟合，再运行线性模型比较。下列数据选择是显式配置，绝不在下载失败后暗中换数据。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n这一段仅核对人工三点，不能用三点拟合优度代表专业数据表现。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\nx_small = np.array([0.,1.,2.]).reshape(-1,1)\ny_small = np.array([1.,2.,2.])\nline = LinearRegression().fit(x_small,y_small)\nprint('斜率、截距:',line.coef_[0],line.intercept_)\nprint('SSE:',np.sum((line.predict(x_small)-y_small)**2))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n默认明确选择辅助随访数据，离线也可运行。切换住房数据需要预先下载；缺缓存会报清楚的错误，不会更换对象。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import fetch_california_housing, load_diabetes\nfrom sklearn.model_selection import train_test_split, cross_val_score, KFold\nfrom sklearn.dummy import DummyRegressor\nfrom sklearn.linear_model import LinearRegression, Ridge, Lasso\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.preprocessing import StandardScaler\n# Explicit choice; no automatic substitution after an error.\nDATASET = 'diabetes_demo'  # Set to 'california' only after downloading its cache.\nif DATASET == 'california':\n    try:\n        b = fetch_california_housing(as_frame=True, download_if_missing=False)\n    except OSError as exc:\n        raise RuntimeError('住房缓存缺失。先运行 scripts/fetch_housing.py；本实验不会自动换数据。') from exc\n    dataset_name = 'California Housing; target unit: 100,000 USD'\nelif DATASET == 'diabetes_demo':\n    b = load_diabetes(as_frame=True)\n    dataset_name = 'Diabetes: auxiliary algorithm demonstration, NOT housing'\nelse:\n    raise ValueError('DATASET must be california or diabetes_demo')\nX, y = b.data, b.target\nX_dev, X_test, y_dev, y_test = train_test_split(X,y,test_size=.2,random_state=42)\ncv = KFold(5,shuffle=True,random_state=7)\nprint('本次数据:', dataset_name, X.shape)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n相同开发数据和五折划分比较模型。数值大小依赖本次实际数据，不同目标单位的MAE不可直接比较。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "models={'dummy':DummyRegressor(),\n        'OLS':make_pipeline(StandardScaler(),LinearRegression()),\n        'Ridge':make_pipeline(StandardScaler(),Ridge(alpha=10.0)),\n        'Lasso':make_pipeline(StandardScaler(),Lasso(alpha=1.0,max_iter=5000))}\nfor name,model in models.items():\n    s=-cross_val_score(model,X_dev,y_dev,cv=cv,scoring='neg_mean_absolute_error')\n    print(name,'MAE',round(s.mean(),4),'fold std',round(s.std(),4))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 核对三点最小二乘的斜率、截距和SSE。\n2. 说明你实际运行的是哪一数据集、目标单位是否已知。\n3. 正则化怎样改变允许的系数？\n4. 换成物理数据时哪些假设需要重新检查？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch05_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第5章 线性回归与正则化\n\n## 先认识对象和任务\n主案例是加州住房数据（California Housing）：1990年人口普查街区组的8项区域统计量，目标是区域住房价值中位数，单位为十万美元；一行不是一套房屋。首次使用需要下载，完整字段见正文5.1节。\n\n糖尿病随访数据（Diabetes）是一个明确命名的辅助回归案例：442名受试者的10项基线测量与一年后的疾病进展数值目标。默认特征已由来源作尺度处理，不是直接的原始化验单位。本例只演示回归计算，不作医学判断，也不把它称为住房数据。见正文5.6节。\n\n## 本次要理解什么\n先核对三点直线拟合，再运行线性模型比较。下列数据选择是显式配置，绝不在下载失败后暗中换数据。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n这一段仅核对人工三点，不能用三点拟合优度代表专业数据表现。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\nx_small = np.array([0.,1.,2.]).reshape(-1,1)\ny_small = np.array([1.,2.,2.])\nline = LinearRegression().fit(x_small,y_small)\nprint('斜率、截距:',line.coef_[0],line.intercept_)\nprint('SSE:',np.sum((line.predict(x_small)-y_small)**2))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n默认明确选择辅助随访数据，离线也可运行。切换住房数据需要预先下载；缺缓存会报清楚的错误，不会更换对象。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import fetch_california_housing, load_diabetes\nfrom sklearn.model_selection import train_test_split, cross_val_score, KFold\nfrom sklearn.dummy import DummyRegressor\nfrom sklearn.linear_model import LinearRegression, Ridge, Lasso\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.preprocessing import StandardScaler\n# Explicit choice; no automatic substitution after an error.\nDATASET = 'diabetes_demo'  # Set to 'california' only after downloading its cache.\nif DATASET == 'california':\n    try:\n        b = fetch_california_housing(as_frame=True, download_if_missing=False)\n    except OSError as exc:\n        raise RuntimeError('住房缓存缺失。先运行 scripts/fetch_housing.py；本实验不会自动换数据。') from exc\n    dataset_name = 'California Housing; target unit: 100,000 USD'\nelif DATASET == 'diabetes_demo':\n    b = load_diabetes(as_frame=True)\n    dataset_name = 'Diabetes: auxiliary algorithm demonstration, NOT housing'\nelse:\n    raise ValueError('DATASET must be california or diabetes_demo')\nX, y = b.data, b.target\nX_dev, X_test, y_dev, y_test = train_test_split(X,y,test_size=.2,random_state=42)\ncv = KFold(5,shuffle=True,random_state=7)\nprint('本次数据:', dataset_name, X.shape)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n相同开发数据和五折划分比较模型。数值大小依赖本次实际数据，不同目标单位的MAE不可直接比较。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "models={'dummy':DummyRegressor(),\n        'OLS':make_pipeline(StandardScaler(),LinearRegression()),\n        'Ridge':make_pipeline(StandardScaler(),Ridge(alpha=10.0)),\n        'Lasso':make_pipeline(StandardScaler(),Lasso(alpha=1.0,max_iter=5000))}\nfor name,model in models.items():\n    s=-cross_val_score(model,X_dev,y_dev,cv=cv,scoring='neg_mean_absolute_error')\n    print(name,'MAE',round(s.mean(),4),'fold std',round(s.std(),4))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 核对三点最小二乘的斜率、截距和SSE。\n2. 说明你实际运行的是哪一数据集、目标单位是否已知。\n3. 正则化怎样改变允许的系数？\n4. 换成物理数据时哪些假设需要重新检查？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch06_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第6章 逻辑回归与概率分类\n\n## 先认识对象和任务\n鸢尾花数据集（Iris）记录150朵花的萼片长度、萼片宽度、花瓣长度和花瓣宽度，四列单位均为厘米。每行对应一朵花；目标是三个物种之一。程序用0、1、2标识类别，编号之间没有数量距离。数据和字段解释见正文1.2节，完整说明见 `data/dataset_guide.md`。\n\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n先算得分、概率和交叉熵，再看验证数据上的阈值变化。阈值比较使用验证集，不使用最终保留集。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 从得分到概率与损失\n一个人工样本的两个输入为(2,0.5)，权重为(1,-1)，偏置为-0.5。先算线性得分，再用Sigmoid变成0至1的数。最后比较同一正类样本被赋予0.8和0.2概率时的损失。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom scipy.special import expit, softmax\nx=np.array([2.,.5]); w0=np.array([1.,-1.]); b0=-.5\nz=w0@x+b0\nprint('得分、概率:',z,expit(z))\nprint('正类概率.8/.2的交叉熵:',-np.log([.8,.2]))\nprint('三类得分log2/log3/0的概率:',softmax([np.log(2),np.log(3),0]))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_iris,load_wine\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import precision_score,recall_score\nimport numpy as np\nX,y=load_iris(return_X_y=True)\nmask=y<2\nXtr,Xval,ytr,yval=train_test_split(X[mask],y[mask],stratify=y[mask],\n                                   test_size=.25,random_state=42)\nm=make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000)).fit(Xtr,ytr)\np=m.predict_proba(Xval)[:,1]\nfor threshold in [.2,.5,.8]:\n    pred=(p>=threshold).astype(int)\n    print(threshold,precision_score(yval,pred,zero_division=0),\n          recall_score(yval,pred,zero_division=0))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.model_selection import StratifiedKFold,cross_val_score\nw=load_wine(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev, X_final, y_dev, y_final = train_test_split(w.data,w.target,\n    test_size=.2,stratify=w.target,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nprint(cross_val_score(make_pipeline(StandardScaler(),\n       LogisticRegression(max_iter=2000)),X_dev,y_dev,cv=cv))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch06_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第6章 逻辑回归与概率分类\n\n## 先认识对象和任务\n鸢尾花数据集（Iris）记录150朵花的萼片长度、萼片宽度、花瓣长度和花瓣宽度，四列单位均为厘米。每行对应一朵花；目标是三个物种之一。程序用0、1、2标识类别，编号之间没有数量距离。数据和字段解释见正文1.2节，完整说明见 `data/dataset_guide.md`。\n\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n先算得分、概率和交叉熵，再看验证数据上的阈值变化。阈值比较使用验证集，不使用最终保留集。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 从得分到概率与损失\n一个人工样本的两个输入为(2,0.5)，权重为(1,-1)，偏置为-0.5。先算线性得分，再用Sigmoid变成0至1的数。最后比较同一正类样本被赋予0.8和0.2概率时的损失。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom scipy.special import expit, softmax\nx=np.array([2.,.5]); w0=np.array([1.,-1.]); b0=-.5\nz=w0@x+b0\nprint('得分、概率:',z,expit(z))\nprint('正类概率.8/.2的交叉熵:',-np.log([.8,.2]))\nprint('三类得分log2/log3/0的概率:',softmax([np.log(2),np.log(3),0]))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_iris,load_wine\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import precision_score,recall_score\nimport numpy as np\nX,y=load_iris(return_X_y=True)\nmask=y<2\nXtr,Xval,ytr,yval=train_test_split(X[mask],y[mask],stratify=y[mask],\n                                   test_size=.25,random_state=42)\nm=make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000)).fit(Xtr,ytr)\np=m.predict_proba(Xval)[:,1]\nfor threshold in [.2,.5,.8]:\n    pred=(p>=threshold).astype(int)\n    print(threshold,precision_score(yval,pred,zero_division=0),\n          recall_score(yval,pred,zero_division=0))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.model_selection import StratifiedKFold,cross_val_score\nw=load_wine(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev, X_final, y_dev, y_final = train_test_split(w.data,w.target,\n    test_size=.2,stratify=w.target,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nprint(cross_val_score(make_pipeline(StandardScaler(),\n       LogisticRegression(max_iter=2000)),X_dev,y_dev,cv=cv))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch07_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第7章 K近邻方法\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\nK近邻根据与新样本最接近的若干训练记录作出判断。先手算二维人工例子，再检查尺度与邻居数。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 手算三个最近邻\n以下五条二维记录是人工构造的，不是葡萄酒测量。先计算查询点(2,2)到每条记录的距离；选前三个邻居，再投票。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.neighbors import KNeighborsClassifier\npoints=np.array([[1,2],[2,3],[3,3],[5,2],[5,5]])\nlabels=np.array([0,0,1,1,1]); query=np.array([[2,2]])\ndistance=np.linalg.norm(points-query,axis=1)\nnearest=np.argsort(distance)[:3]\nprint('距离:',distance,'最近编号:',nearest,'对应类别:',labels[nearest])\nprint('sklearn预测:',KNeighborsClassifier(n_neighbors=3).fit(points,labels).predict(query))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.neighbors import KNeighborsClassifier\nw=load_wine(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev, X_final, y_dev, y_final = train_test_split(w.data,w.target,\n    test_size=.2,stratify=w.target,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor k in [1,3,5,11,21]:\n    for scaled in [False,True]:\n        model=KNeighborsClassifier(n_neighbors=k)\n        if scaled:model=make_pipeline(StandardScaler(),model)\n        s=cross_val_score(model,X_dev,y_dev,cv=cv)\n        print('k',k,'scaled',scaled,'mean',s.mean())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch07_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第7章 K近邻方法\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\nK近邻根据与新样本最接近的若干训练记录作出判断。先手算二维人工例子，再检查尺度与邻居数。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 手算三个最近邻\n以下五条二维记录是人工构造的，不是葡萄酒测量。先计算查询点(2,2)到每条记录的距离；选前三个邻居，再投票。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.neighbors import KNeighborsClassifier\npoints=np.array([[1,2],[2,3],[3,3],[5,2],[5,5]])\nlabels=np.array([0,0,1,1,1]); query=np.array([[2,2]])\ndistance=np.linalg.norm(points-query,axis=1)\nnearest=np.argsort(distance)[:3]\nprint('距离:',distance,'最近编号:',nearest,'对应类别:',labels[nearest])\nprint('sklearn预测:',KNeighborsClassifier(n_neighbors=3).fit(points,labels).predict(query))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.neighbors import KNeighborsClassifier\nw=load_wine(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev, X_final, y_dev, y_final = train_test_split(w.data,w.target,\n    test_size=.2,stratify=w.target,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor k in [1,3,5,11,21]:\n    for scaled in [False,True]:\n        model=KNeighborsClassifier(n_neighbors=k)\n        if scaled:model=make_pipeline(StandardScaler(),model)\n        s=cross_val_score(model,X_dev,y_dev,cv=cv)\n        print('k',k,'scaled',scaled,'mean',s.mean())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch08_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第8章 决策树\n\n## 先认识对象和任务\n鸢尾花数据集（Iris）记录150朵花的萼片长度、萼片宽度、花瓣长度和花瓣宽度，四列单位均为厘米。每行对应一朵花；目标是三个物种之一。程序用0、1、2标识类别，编号之间没有数量距离。数据和字段解释见正文1.2节，完整说明见 `data/dataset_guide.md`。\n\n## 本次要理解什么\n节点按一个条件将记录送入两个分支；叶节点给出预测。先算同一节点两个候选划分的质量，再读一棵实际训练的小树。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 比较两个候选划分\n人工特征取1至10，标签在代码中给定。不纯度描述节点的类别混杂程度；子节点加权不纯度较小，代表这次划分使两边更纯。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nx=np.arange(1,11); labels=np.array([0,0,0,0,1,1,0,0,1,1])\ndef gini(v):\n    p=np.bincount(v,minlength=2)/len(v)\n    return 1-np.sum(p*p)\nprint('划分前:',gini(labels))\nfor threshold in [4.5,6.5]:\n    left=labels[x<=threshold]; right=labels[x>threshold]\n    quality=(len(left)*gini(left)+len(right)*gini(right))/len(labels)\n    print('阈值、子节点加权不纯度、减少量:',threshold,quality,gini(labels)-quality)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_iris\nfrom sklearn.tree import DecisionTreeClassifier,export_text\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nb=load_iris(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev,X_final,y_dev,y_final=train_test_split(b.data,b.target,test_size=.2,\n                                           stratify=b.target,random_state=42)\nt=DecisionTreeClassifier(max_depth=3,min_samples_leaf=3,random_state=42)\nt.fit(X_dev,y_dev)\nprint(export_text(t,feature_names=list(b.feature_names)))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "cv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor dep in [1,2,3,4,6,10]:\n    s=cross_val_score(DecisionTreeClassifier(max_depth=dep,random_state=42),\n                      X_dev,y_dev,cv=cv)\n    print(dep,s.mean(),s.std())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch08_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第8章 决策树\n\n## 先认识对象和任务\n鸢尾花数据集（Iris）记录150朵花的萼片长度、萼片宽度、花瓣长度和花瓣宽度，四列单位均为厘米。每行对应一朵花；目标是三个物种之一。程序用0、1、2标识类别，编号之间没有数量距离。数据和字段解释见正文1.2节，完整说明见 `data/dataset_guide.md`。\n\n## 本次要理解什么\n节点按一个条件将记录送入两个分支；叶节点给出预测。先算同一节点两个候选划分的质量，再读一棵实际训练的小树。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 比较两个候选划分\n人工特征取1至10，标签在代码中给定。不纯度描述节点的类别混杂程度；子节点加权不纯度较小，代表这次划分使两边更纯。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nx=np.arange(1,11); labels=np.array([0,0,0,0,1,1,0,0,1,1])\ndef gini(v):\n    p=np.bincount(v,minlength=2)/len(v)\n    return 1-np.sum(p*p)\nprint('划分前:',gini(labels))\nfor threshold in [4.5,6.5]:\n    left=labels[x<=threshold]; right=labels[x>threshold]\n    quality=(len(left)*gini(left)+len(right)*gini(right))/len(labels)\n    print('阈值、子节点加权不纯度、减少量:',threshold,quality,gini(labels)-quality)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_iris\nfrom sklearn.tree import DecisionTreeClassifier,export_text\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nb=load_iris(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev,X_final,y_dev,y_final=train_test_split(b.data,b.target,test_size=.2,\n                                           stratify=b.target,random_state=42)\nt=DecisionTreeClassifier(max_depth=3,min_samples_leaf=3,random_state=42)\nt.fit(X_dev,y_dev)\nprint(export_text(t,feature_names=list(b.feature_names)))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "cv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor dep in [1,2,3,4,6,10]:\n    s=cross_val_score(DecisionTreeClassifier(max_depth=dep,random_state=42),\n                      X_dev,y_dev,cv=cv)\n    print(dep,s.mean(),s.std())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch09_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第9章 随机森林与Bagging\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n集成是组合多个基模型的预测。Bagging对训练样本有放回抽样；森林还在节点划分时随机选择候选特征。先观察重采样和预测合并，再比较模型。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 有放回抽样与合并预测\n一次抽样可以重复选中同一记录，也会漏掉一些记录。下面是五个对象的一次人工示例，不是额外的真实数据。随后比较平均类别概率与硬投票。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\noriginal=np.array(['A','B','C','D','E'])\nbootstrap=np.array(['A','C','C','E','A'])\nprint('本次抽样:',bootstrap,'袋外对象:',sorted(set(original)-set(bootstrap)))\npA=np.array([.51,.51,.01])\nprint('平均P(A):',pA.mean(),'按平均概率预测A:',pA.mean()>.5)\nprint('按每棵树硬分类投票预测A:',np.mean(pA>.5)>.5)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nX,y=load_wine(return_X_y=True)\nfrom sklearn.model_selection import train_test_split\nX, X_final, y, y_final = train_test_split(X,y,test_size=.2,stratify=y,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor name,m in [('tree',DecisionTreeClassifier(max_depth=4,random_state=42)),\n               ('forest',RandomForestClassifier(n_estimators=150,\n                  min_samples_leaf=2,random_state=42,n_jobs=1))]:\n    s=cross_val_score(m,X,y,cv=cv)\n    print(name,s.mean(),s.std())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "f=RandomForestClassifier(n_estimators=200,oob_score=True,\n                         bootstrap=True,random_state=42,n_jobs=1).fit(X,y)\nprint('OOB score, not an independent scientific group test:',f.oob_score_)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch09_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第9章 随机森林与Bagging\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n集成是组合多个基模型的预测。Bagging对训练样本有放回抽样；森林还在节点划分时随机选择候选特征。先观察重采样和预测合并，再比较模型。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 有放回抽样与合并预测\n一次抽样可以重复选中同一记录，也会漏掉一些记录。下面是五个对象的一次人工示例，不是额外的真实数据。随后比较平均类别概率与硬投票。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\noriginal=np.array(['A','B','C','D','E'])\nbootstrap=np.array(['A','C','C','E','A'])\nprint('本次抽样:',bootstrap,'袋外对象:',sorted(set(original)-set(bootstrap)))\npA=np.array([.51,.51,.01])\nprint('平均P(A):',pA.mean(),'按平均概率预测A:',pA.mean()>.5)\nprint('按每棵树硬分类投票预测A:',np.mean(pA>.5)>.5)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nX,y=load_wine(return_X_y=True)\nfrom sklearn.model_selection import train_test_split\nX, X_final, y, y_final = train_test_split(X,y,test_size=.2,stratify=y,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor name,m in [('tree',DecisionTreeClassifier(max_depth=4,random_state=42)),\n               ('forest',RandomForestClassifier(n_estimators=150,\n                  min_samples_leaf=2,random_state=42,n_jobs=1))]:\n    s=cross_val_score(m,X,y,cv=cv)\n    print(name,s.mean(),s.std())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "f=RandomForestClassifier(n_estimators=200,oob_score=True,\n                         bootstrap=True,random_state=42,n_jobs=1).fit(X,y)\nprint('OOB score, not an independent scientific group test:',f.oob_score_)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch10_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第10章 梯度提升树及其应用\n\n## 先认识对象和任务\n本实验先使用人工四点记录，再使用一个已知函数产生的模拟回归数据。后者由 `make_friedman1` 生成，名字是该测试函数的标识：前五个输入通过非线性公式生成目标，其余五列不参与生成目标。它不是住房、天文观测或物理实验数据。\n\n## 本次要理解什么\n平方损失下，每一轮小树拟合当前的目标减预测残差，只按学习率加入一部分修正。主教材的住房/物理项目需要换用已介绍的真实数据另行验证。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 四点数据的两轮提升\n人工目标为1、1、3、3。初始模型对每个样本都预测均值2。每轮一棵深度为1的树拟合当前残差，并以0.5的学习率加入；记录半均方误差。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.tree import DecisionTreeRegressor\nx_small=np.arange(1,5).reshape(-1,1); y_small=np.array([1.,1.,3.,3.])\nf=np.full(4,y_small.mean())\nprint('初始:',f,'半MSE',np.mean((y_small-f)**2)/2)\nfor step in range(2):\n    residual=y_small-f\n    weak=DecisionTreeRegressor(max_depth=1,random_state=42).fit(x_small,residual)\n    f += .5*weak.predict(x_small)\n    print('轮次',step+1,'预测',f,'半MSE',np.mean((y_small-f)**2)/2)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n人工函数为10 sin(pi x1 x2)+20(x3−0.5)^2+10x4+5x5，再加标准差为1的噪声；十个输入在0至1范围生成。三折比较只使用开发部分，输出MAE越小越好。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import make_friedman1\nfrom sklearn.ensemble import GradientBoostingRegressor,RandomForestRegressor\nfrom sklearn.model_selection import KFold,cross_val_score\nX,y=make_friedman1(n_samples=600,n_features=10,noise=1.0,random_state=42)\nfrom sklearn.model_selection import train_test_split\nX, X_final, y, y_final = train_test_split(X,y,test_size=.2,random_state=42)\ncv=KFold(3,shuffle=True,random_state=7)\nfor n in [30,80,150]:\n    gb=GradientBoostingRegressor(n_estimators=n,max_depth=2,\n                                 learning_rate=.08,random_state=42)\n    rf=RandomForestRegressor(n_estimators=n,max_depth=5,\n                             random_state=42,n_jobs=1)\n    for tag,model in [('GBR',gb),('RF',rf)]:\n        mae=-cross_val_score(model,X,y,cv=cv,\n                             scoring='neg_mean_absolute_error').mean()\n        print(n,tag,mae)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch10_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第10章 梯度提升树及其应用\n\n## 先认识对象和任务\n本实验先使用人工四点记录，再使用一个已知函数产生的模拟回归数据。后者由 `make_friedman1` 生成，名字是该测试函数的标识：前五个输入通过非线性公式生成目标，其余五列不参与生成目标。它不是住房、天文观测或物理实验数据。\n\n## 本次要理解什么\n平方损失下，每一轮小树拟合当前的目标减预测残差，只按学习率加入一部分修正。主教材的住房/物理项目需要换用已介绍的真实数据另行验证。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 四点数据的两轮提升\n人工目标为1、1、3、3。初始模型对每个样本都预测均值2。每轮一棵深度为1的树拟合当前残差，并以0.5的学习率加入；记录半均方误差。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.tree import DecisionTreeRegressor\nx_small=np.arange(1,5).reshape(-1,1); y_small=np.array([1.,1.,3.,3.])\nf=np.full(4,y_small.mean())\nprint('初始:',f,'半MSE',np.mean((y_small-f)**2)/2)\nfor step in range(2):\n    residual=y_small-f\n    weak=DecisionTreeRegressor(max_depth=1,random_state=42).fit(x_small,residual)\n    f += .5*weak.predict(x_small)\n    print('轮次',step+1,'预测',f,'半MSE',np.mean((y_small-f)**2)/2)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n人工函数为10 sin(pi x1 x2)+20(x3−0.5)^2+10x4+5x5，再加标准差为1的噪声；十个输入在0至1范围生成。三折比较只使用开发部分，输出MAE越小越好。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import make_friedman1\nfrom sklearn.ensemble import GradientBoostingRegressor,RandomForestRegressor\nfrom sklearn.model_selection import KFold,cross_val_score\nX,y=make_friedman1(n_samples=600,n_features=10,noise=1.0,random_state=42)\nfrom sklearn.model_selection import train_test_split\nX, X_final, y, y_final = train_test_split(X,y,test_size=.2,random_state=42)\ncv=KFold(3,shuffle=True,random_state=7)\nfor n in [30,80,150]:\n    gb=GradientBoostingRegressor(n_estimators=n,max_depth=2,\n                                 learning_rate=.08,random_state=42)\n    rf=RandomForestRegressor(n_estimators=n,max_depth=5,\n                             random_state=42,n_jobs=1)\n    for tag,model in [('GBR',gb),('RF',rf)]:\n        mae=-cross_val_score(model,X,y,cv=cv,\n                             scoring='neg_mean_absolute_error').mean()\n        print(n,tag,mae)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch11_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第11章 支持向量机与核方法\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n本章另外使用人工双月形数据：两类二维点分布在两条弯曲弧线附近，由 `make_moons` 生成。名称描述点的形状，并非观测月球的数据。\n\n## 本次要理解什么\n从间隔和核相似度的数值进入模型。双月例子说明线性与非线性边界的差别；葡萄酒例子复用相同开发集。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 核函数的数值含义\nRBF核把平方距离代入指数函数。gamma越大，相似性随距离下降得越快；这不是改变样本标签。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfor gamma in [1.,4.]:\n    for distance in [0.,1.,2.]:\n        print('gamma, distance, kernel:',gamma,distance,np.exp(-gamma*distance**2))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import make_moons,load_wine\nfrom sklearn.svm import SVC\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import make_pipeline\nX,y=make_moons(n_samples=300,noise=.14,random_state=42)\nfrom sklearn.model_selection import train_test_split\nX,X_final,y,y_final=train_test_split(X,y,test_size=.2,stratify=y,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor kernel in ['linear','rbf']:\n    model=make_pipeline(StandardScaler(),SVC(kernel=kernel,C=2,gamma=2))\n    print(kernel,cross_val_score(model,X,y,cv=cv).mean())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "w=load_wine(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev, X_final, y_dev, y_final = train_test_split(w.data,w.target,\n    test_size=.2,stratify=w.target,random_state=42)\nmodel=make_pipeline(StandardScaler(),SVC(kernel='rbf',C=1,gamma='scale'))\nprint('Wine CV:',cross_val_score(model,X_dev,y_dev,cv=cv).mean())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch11_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第11章 支持向量机与核方法\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n本章另外使用人工双月形数据：两类二维点分布在两条弯曲弧线附近，由 `make_moons` 生成。名称描述点的形状，并非观测月球的数据。\n\n## 本次要理解什么\n从间隔和核相似度的数值进入模型。双月例子说明线性与非线性边界的差别；葡萄酒例子复用相同开发集。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 核函数的数值含义\nRBF核把平方距离代入指数函数。gamma越大，相似性随距离下降得越快；这不是改变样本标签。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfor gamma in [1.,4.]:\n    for distance in [0.,1.,2.]:\n        print('gamma, distance, kernel:',gamma,distance,np.exp(-gamma*distance**2))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import make_moons,load_wine\nfrom sklearn.svm import SVC\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import make_pipeline\nX,y=make_moons(n_samples=300,noise=.14,random_state=42)\nfrom sklearn.model_selection import train_test_split\nX,X_final,y,y_final=train_test_split(X,y,test_size=.2,stratify=y,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor kernel in ['linear','rbf']:\n    model=make_pipeline(StandardScaler(),SVC(kernel=kernel,C=2,gamma=2))\n    print(kernel,cross_val_score(model,X,y,cv=cv).mean())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "w=load_wine(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev, X_final, y_dev, y_final = train_test_split(w.data,w.target,\n    test_size=.2,stratify=w.target,random_state=42)\nmodel=make_pipeline(StandardScaler(),SVC(kernel='rbf',C=1,gamma='scale'))\nprint('Wine CV:',cross_val_score(model,X_dev,y_dev,cv=cv).mean())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch12_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第12章 多层感知机与神经网络入门\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n手写数字数据集（Digits）包含1797幅8×8的灰度图像，每个像素值为0至16。每幅图像是一个样本，目标是图片所写的数字类别0至9。把64个像素按固定顺序展开为64列，是把图像变成表格输入，不改变它仍是分类问题。见正文12.8节。\n\n## 本次要理解什么\n多层感知机（MLP）将输入依次送过隐藏层和输出层。先追踪小网络数值，再用反向梯度更新一次，最后调用sklearn完成训练。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 跟算一个双隐藏单元网络\n隐藏单元先加权求和并加偏置，再通过ReLU把负值截为0。输出层在隐藏值上重新加权，并用Sigmoid输出二分类概率。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom scipy.special import expit\nx=np.array([1.,2.]); W=np.array([[1.,0.],[-1.,1.]])\nb=np.array([0.,-2.]); z=W@x+b; h=np.maximum(z,0)\nscore=np.array([2.,-1.])@h-.5\nprint('隐藏得分、激活、输出得分、概率:',z,h,score,expit(score))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 计算梯度后更新一次\n这个单隐藏单元例子与上面双单元例子不同：x=2，目标y=1，输出为连续值。正文12.5节给出的四个梯度依次对应w1、b1、w2、b2；优化器按学习率0.01同时更新。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "theta=np.array([.5,0.,3.,0.])\ndef network(t):\n    w1,b1,w2,b2=t\n    return w2*max(w1*2+b1,0)+b2\npred_before=network(theta)\ngrad=np.array([12.,6.,2.,2.])\nupdated=theta-.01*grad\nprint('原预测/损失:',pred_before,.5*(pred_before-1)**2)\nprint('新参数:',updated)\nprint('新预测/损失:',network(updated),.5*(network(updated)-1)**2)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.neural_network import MLPClassifier\nX,y=load_wine(return_X_y=True)\nfrom sklearn.model_selection import train_test_split\nX, X_final, y, y_final = train_test_split(X,y,test_size=.2,stratify=y,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor name,m in [('logistic',LogisticRegression(max_iter=2000)),\n               ('MLP',MLPClassifier(hidden_layer_sizes=(20,),alpha=.01,\n                                   max_iter=500,random_state=42))]:\n    p=make_pipeline(StandardScaler(),m)\n    s=cross_val_score(p,X,y,cv=cv)\n    print(name,s.mean(),s.std())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.model_selection import train_test_split\nXtr,Xval,ytr,yval=train_test_split(X,y,stratify=y,\n                                   test_size=.25,random_state=42)\nsc=StandardScaler().fit(Xtr)\nfor seed in [1,7,42]:\n    m=MLPClassifier(hidden_layer_sizes=(16,),alpha=.01,\n                    max_iter=450,random_state=seed).fit(sc.transform(Xtr),ytr)\n    print(seed,len(m.loss_curve_),m.loss_curve_[-1],\n          m.score(sc.transform(Xval),yval))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 提高：读懂一幅数字图像\n手写数字数据集（Digits）包含1797幅8×8的灰度图像，每个像素值为0至16。每幅图像是一个样本，目标是图片所写的数字类别0至9。把64个像素按固定顺序展开为64列，是把图像变成表格输入，不改变它仍是分类问题。见正文12.8节。\n下面只检查数据表示。训练和误分类图属于提高练习，不把读取图像等同于完成识别。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_digits\ndigits=load_digits()\nprint('第一幅图像的8×8像素矩阵:\\n',digits.images[0])\nprint('展开形状、类别:',digits.data[0].shape,digits.target[0])\nassert np.array_equal(digits.images[0].reshape(-1),digits.data[0])",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 训练警告也是结果的一部分\n`ConvergenceWarning` 表示在指定最大迭代次数内没有达到软件的停止准则，不等于代码崩溃，也不证明模型已经充分训练。本章有意保留有限迭代预算，可能出现此警告。请记录迭代数、损失变化及验证表现，再比较更长训练预算；不要通过关闭警告来宣布收敛。这个检查仍不能以查看最终保留数据来选择预算。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch12_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第12章 多层感知机与神经网络入门\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n手写数字数据集（Digits）包含1797幅8×8的灰度图像，每个像素值为0至16。每幅图像是一个样本，目标是图片所写的数字类别0至9。把64个像素按固定顺序展开为64列，是把图像变成表格输入，不改变它仍是分类问题。见正文12.8节。\n\n## 本次要理解什么\n多层感知机（MLP）将输入依次送过隐藏层和输出层。先追踪小网络数值，再用反向梯度更新一次，最后调用sklearn完成训练。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 跟算一个双隐藏单元网络\n隐藏单元先加权求和并加偏置，再通过ReLU把负值截为0。输出层在隐藏值上重新加权，并用Sigmoid输出二分类概率。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom scipy.special import expit\nx=np.array([1.,2.]); W=np.array([[1.,0.],[-1.,1.]])\nb=np.array([0.,-2.]); z=W@x+b; h=np.maximum(z,0)\nscore=np.array([2.,-1.])@h-.5\nprint('隐藏得分、激活、输出得分、概率:',z,h,score,expit(score))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 计算梯度后更新一次\n这个单隐藏单元例子与上面双单元例子不同：x=2，目标y=1，输出为连续值。正文12.5节给出的四个梯度依次对应w1、b1、w2、b2；优化器按学习率0.01同时更新。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "theta=np.array([.5,0.,3.,0.])\ndef network(t):\n    w1,b1,w2,b2=t\n    return w2*max(w1*2+b1,0)+b2\npred_before=network(theta)\ngrad=np.array([12.,6.,2.,2.])\nupdated=theta-.01*grad\nprint('原预测/损失:',pred_before,.5*(pred_before-1)**2)\nprint('新参数:',updated)\nprint('新预测/损失:',network(updated),.5*(network(updated)-1)**2)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.neural_network import MLPClassifier\nX,y=load_wine(return_X_y=True)\nfrom sklearn.model_selection import train_test_split\nX, X_final, y, y_final = train_test_split(X,y,test_size=.2,stratify=y,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor name,m in [('logistic',LogisticRegression(max_iter=2000)),\n               ('MLP',MLPClassifier(hidden_layer_sizes=(20,),alpha=.01,\n                                   max_iter=500,random_state=42))]:\n    p=make_pipeline(StandardScaler(),m)\n    s=cross_val_score(p,X,y,cv=cv)\n    print(name,s.mean(),s.std())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.model_selection import train_test_split\nXtr,Xval,ytr,yval=train_test_split(X,y,stratify=y,\n                                   test_size=.25,random_state=42)\nsc=StandardScaler().fit(Xtr)\nfor seed in [1,7,42]:\n    m=MLPClassifier(hidden_layer_sizes=(16,),alpha=.01,\n                    max_iter=450,random_state=seed).fit(sc.transform(Xtr),ytr)\n    print(seed,len(m.loss_curve_),m.loss_curve_[-1],\n          m.score(sc.transform(Xval),yval))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 提高：读懂一幅数字图像\n手写数字数据集（Digits）包含1797幅8×8的灰度图像，每个像素值为0至16。每幅图像是一个样本，目标是图片所写的数字类别0至9。把64个像素按固定顺序展开为64列，是把图像变成表格输入，不改变它仍是分类问题。见正文12.8节。\n下面只检查数据表示。训练和误分类图属于提高练习，不把读取图像等同于完成识别。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_digits\ndigits=load_digits()\nprint('第一幅图像的8×8像素矩阵:\\n',digits.images[0])\nprint('展开形状、类别:',digits.data[0].shape,digits.target[0])\nassert np.array_equal(digits.images[0].reshape(-1),digits.data[0])",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 训练警告也是结果的一部分\n`ConvergenceWarning` 表示在指定最大迭代次数内没有达到软件的停止准则，不等于代码崩溃，也不证明模型已经充分训练。本章有意保留有限迭代预算，可能出现此警告。请记录迭代数、损失变化及验证表现，再比较更长训练预算；不要通过关闭警告来宣布收敛。这个检查仍不能以查看最终保留数据来选择预算。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch13_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第13章 主成分分析与特征表示\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n主成分分析（PCA）从输入变化中寻找新的坐标方向，不用类别来确定这些方向。投影后的坐标称为主成分得分。本章比较保留变化信息与保留分类信息这两个不同目标。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.decomposition import PCA\npoints = np.array([[-2.,-2.],[-1.,-1.],[1.,1.],[2.,2.]])\npca_small = PCA(n_components=1).fit(points)\nprint('单位主方向（整体正负号均可）:',pca_small.components_)\nprint('解释方差:',pca_small.explained_variance_)\nprint('查询点重构:',pca_small.inverse_transform(pca_small.transform([[1.,0.]])))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.model_selection import train_test_split\nb=load_wine(as_frame=True)\nX_dev,X_final,y_dev,y_final=train_test_split(b.data,b.target,\n    test_size=.2,stratify=b.target,random_state=42)\nscaled=StandardScaler().fit_transform(X_dev)\np=PCA().fit(scaled)\nprint('前6个解释方差比例:',p.explained_variance_ratio_[:6])\nprint('前6个累计比例:',p.explained_variance_ratio_[:6].sum())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\nno_pca分支不创建PCA，是真正的不降维对照。PCA(None)仍会旋转坐标，不能用它表示完全跳过PCA。每折内分别拟合标准化和PCA。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.pipeline import make_pipeline\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor n in ['no_pca',2,5,10]:\n    steps=[StandardScaler()]\n    if n != 'no_pca':\n        steps.append(PCA(n_components=n))\n    steps.append(LogisticRegression(max_iter=2000))\n    model=make_pipeline(*steps)\n    print(n,cross_val_score(model,X_dev,y_dev,cv=cv).mean())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch13_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第13章 主成分分析与特征表示\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n主成分分析（PCA）从输入变化中寻找新的坐标方向，不用类别来确定这些方向。投影后的坐标称为主成分得分。本章比较保留变化信息与保留分类信息这两个不同目标。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.decomposition import PCA\npoints = np.array([[-2.,-2.],[-1.,-1.],[1.,1.],[2.,2.]])\npca_small = PCA(n_components=1).fit(points)\nprint('单位主方向（整体正负号均可）:',pca_small.components_)\nprint('解释方差:',pca_small.explained_variance_)\nprint('查询点重构:',pca_small.inverse_transform(pca_small.transform([[1.,0.]])))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.model_selection import train_test_split\nb=load_wine(as_frame=True)\nX_dev,X_final,y_dev,y_final=train_test_split(b.data,b.target,\n    test_size=.2,stratify=b.target,random_state=42)\nscaled=StandardScaler().fit_transform(X_dev)\np=PCA().fit(scaled)\nprint('前6个解释方差比例:',p.explained_variance_ratio_[:6])\nprint('前6个累计比例:',p.explained_variance_ratio_[:6].sum())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\nno_pca分支不创建PCA，是真正的不降维对照。PCA(None)仍会旋转坐标，不能用它表示完全跳过PCA。每折内分别拟合标准化和PCA。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.pipeline import make_pipeline\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import StratifiedKFold,cross_val_score\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nfor n in ['no_pca',2,5,10]:\n    steps=[StandardScaler()]\n    if n != 'no_pca':\n        steps.append(PCA(n_components=n))\n    steps.append(LogisticRegression(max_iter=2000))\n    model=make_pipeline(*steps)\n    print(n,cross_val_score(model,X_dev,y_dev,cv=cv).mean())",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch14_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第14章 聚类分析\n\n## 先认识对象和任务\n人工团状数据由 `make_blobs` 生成；人工双月数据由 `make_moons` 生成。二者分别帮助观察聚类方法对形状的偏好，不能冒充自然形成的群体。\n\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n聚类是在不向算法提供目标类别的情况下，按相似性或密度组织样本。先手算K-means和DBSCAN，再用真实测量数据检查分组与已知类别是否一致。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## K-means与DBSCAN的小例子\nK-means把点分给最近中心并重新计算均值。DBSCAN按邻域内样本数划分核心点、边界点与噪声；min_samples包含该点自身。以下都是人工一维坐标。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.cluster import KMeans,DBSCAN\npoints=np.array([[0.],[2.],[8.],[10.]])\nk=KMeans(n_clusters=2,init=np.array([[0.],[2.]]),n_init=1,random_state=42).fit(points)\nprint('最终中心、SSE:',np.sort(k.cluster_centers_.ravel()),k.inertia_)\nd=DBSCAN(eps=.16,min_samples=3).fit([[0.],[.1],[.2],[.35],[2.]])\nprint('核心点下标、分组:',d.core_sample_indices_,d.labels_)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import make_moons,make_blobs\nfrom sklearn.cluster import KMeans,DBSCAN\nfrom sklearn.preprocessing import StandardScaler\nX,_=make_moons(n_samples=400,noise=.07,random_state=42)\nX=StandardScaler().fit_transform(X)\nk=KMeans(n_clusters=2,n_init=10,random_state=42).fit_predict(X)\nd=DBSCAN(eps=.23,min_samples=5).fit_predict(X)\nprint('KMeans labels:',set(k),'DBSCAN labels:',set(d))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "Xb,_=make_blobs(n_samples=300,centers=4,random_state=42)\nfor n in [2,3,4,5,6]:\n    model=KMeans(n_clusters=n,n_init=10,random_state=42).fit(Xb)\n    print(n,model.inertia_)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n训练聚类时只提供测量矩阵。标签只在最后的列联表用于事后对照，聚类编号可以任意置换，不应直接与类别编号逐项求准确率。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nimport pandas as pd\nw=load_wine(as_frame=True)\nZ=StandardScaler().fit_transform(w.data)\ngroup=KMeans(n_clusters=3,n_init=10,random_state=42).fit_predict(Z)\n# The original class labels enter only this AFTER-training comparison.\nprint(pd.crosstab(w.target,group,rownames=['known class'],colnames=['cluster']))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch14_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第14章 聚类分析\n\n## 先认识对象和任务\n人工团状数据由 `make_blobs` 生成；人工双月数据由 `make_moons` 生成。二者分别帮助观察聚类方法对形状的偏好，不能冒充自然形成的群体。\n\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n聚类是在不向算法提供目标类别的情况下，按相似性或密度组织样本。先手算K-means和DBSCAN，再用真实测量数据检查分组与已知类别是否一致。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## K-means与DBSCAN的小例子\nK-means把点分给最近中心并重新计算均值。DBSCAN按邻域内样本数划分核心点、边界点与噪声；min_samples包含该点自身。以下都是人工一维坐标。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.cluster import KMeans,DBSCAN\npoints=np.array([[0.],[2.],[8.],[10.]])\nk=KMeans(n_clusters=2,init=np.array([[0.],[2.]]),n_init=1,random_state=42).fit(points)\nprint('最终中心、SSE:',np.sort(k.cluster_centers_.ravel()),k.inertia_)\nd=DBSCAN(eps=.16,min_samples=3).fit([[0.],[.1],[.2],[.35],[2.]])\nprint('核心点下标、分组:',d.core_sample_indices_,d.labels_)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import make_moons,make_blobs\nfrom sklearn.cluster import KMeans,DBSCAN\nfrom sklearn.preprocessing import StandardScaler\nX,_=make_moons(n_samples=400,noise=.07,random_state=42)\nX=StandardScaler().fit_transform(X)\nk=KMeans(n_clusters=2,n_init=10,random_state=42).fit_predict(X)\nd=DBSCAN(eps=.23,min_samples=5).fit_predict(X)\nprint('KMeans labels:',set(k),'DBSCAN labels:',set(d))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "Xb,_=make_blobs(n_samples=300,centers=4,random_state=42)\nfor n in [2,3,4,5,6]:\n    model=KMeans(n_clusters=n,n_init=10,random_state=42).fit(Xb)\n    print(n,model.inertia_)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 3\n训练聚类时只提供测量矩阵。标签只在最后的列联表用于事后对照，聚类编号可以任意置换，不应直接与类别编号逐项求准确率。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nimport pandas as pd\nw=load_wine(as_frame=True)\nZ=StandardScaler().fit_transform(w.data)\ngroup=KMeans(n_clusters=3,n_init=10,random_state=42).fit_predict(Z)\n# The original class labels enter only this AFTER-training comparison.\nprint(pd.crosstab(w.target,group,rownames=['known class'],colnames=['cluster']))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch15_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第15章 异常检测\n\n## 先认识对象和任务\n本章使用人工二维数据：240条来自标准正态分布的记录，加上15条在方形区域均匀生成的记录。第二种来源不保证每条都远离主体，可能与主体重叠。因此“注入来源”不等于无争议的几何异常真值。\n\n## 本次要理解什么\n异常分数用于相对排序，阈值把分数变成待检查的候选。先在五个已知分数上观察阈值，再用Isolation Forest（孤立森林）产生分数。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 先理解分数与阈值\n下列五个分数越大表示越值得检查。后两个样本在这个人工示例中被指定为异常。实际数据通常没有如此完整的答案，不能据此假设真实任务容易评价。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\ns=np.array([.1,.2,.35,.8,.9]); reference=np.array([0,0,0,1,1])\nfor t in [.75,.3]:\n    pred=s>=t\n    print('阈值、候选数、真阳性、假阳性:',t,pred.sum(),\n          np.sum(pred & (reference==1)),np.sum(pred & (reference==0)))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n这里的truth只表示是否来自人工注入源。阈值越宽松通常候选越多，但两个生成分布重叠，不能把漏掉每条注入都解释为检测器失效。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.ensemble import IsolationForest\nrng=np.random.default_rng(42)\nnormal=rng.normal(size=(240,2))\ninjected=rng.uniform(-6,6,size=(15,2))\nX=np.vstack([normal,injected])\ntruth=np.r_[np.zeros(240,int),np.ones(15,int)]\nm=IsolationForest(n_estimators=150,contamination='auto',random_state=42).fit(X)\nscore=-m.score_samples(X)\nfor q in [.90,.95,.98]:\n    flag=score>=np.quantile(score,q)\n    print(q,'candidates',flag.sum(),'injected hits',np.sum(flag & (truth==1)))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch15_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第15章 异常检测\n\n## 先认识对象和任务\n本章使用人工二维数据：240条来自标准正态分布的记录，加上15条在方形区域均匀生成的记录。第二种来源不保证每条都远离主体，可能与主体重叠。因此“注入来源”不等于无争议的几何异常真值。\n\n## 本次要理解什么\n异常分数用于相对排序，阈值把分数变成待检查的候选。先在五个已知分数上观察阈值，再用Isolation Forest（孤立森林）产生分数。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 先理解分数与阈值\n下列五个分数越大表示越值得检查。后两个样本在这个人工示例中被指定为异常。实际数据通常没有如此完整的答案，不能据此假设真实任务容易评价。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\ns=np.array([.1,.2,.35,.8,.9]); reference=np.array([0,0,0,1,1])\nfor t in [.75,.3]:\n    pred=s>=t\n    print('阈值、候选数、真阳性、假阳性:',t,pred.sum(),\n          np.sum(pred & (reference==1)),np.sum(pred & (reference==0)))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n这里的truth只表示是否来自人工注入源。阈值越宽松通常候选越多，但两个生成分布重叠，不能把漏掉每条注入都解释为检测器失效。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import numpy as np\nfrom sklearn.ensemble import IsolationForest\nrng=np.random.default_rng(42)\nnormal=rng.normal(size=(240,2))\ninjected=rng.uniform(-6,6,size=(15,2))\nX=np.vstack([normal,injected])\ntruth=np.r_[np.zeros(240,int),np.ones(15,int)]\nm=IsolationForest(n_estimators=150,contamination='auto',random_state=42).fit(X)\nscore=-m.score_samples(X)\nfor q in [.90,.95,.98]:\n    flag=score>=np.quantile(score,q)\n    print(q,'candidates',flag.sum(),'injected hits',np.sum(flag & (truth==1)))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch16_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第16章 模型解释、误差分析与科学结论\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n糖尿病随访数据（Diabetes）是一个明确命名的辅助回归案例：442名受试者的10项基线测量与一年后的疾病进展数值目标。默认特征已由来源作尺度处理，不是直接的原始化验单位。本例只演示回归计算，不作医学判断，也不把它称为住房数据。见正文5.6节。\n\n## 本次要理解什么\n误差分析解释哪些样本更容易出错；置换重要性衡量打乱一列后当前模型表现怎样变化。它们不是证明物理因果机制的方法。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 整体准确率与分组表现\n人工例子中常见组90条全部正确，稀有组10条只正确2条。先计算三个准确率，再判断只报告整体分数是否足够。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "print('整体准确率:',(90+2)/100)\nprint('常见组准确率:',90/90,'稀有组准确率:',2/10)\nprint('若原准确率.9，置换某列后.7，下降:',.9-.7)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.inspection import permutation_importance\nfrom sklearn.metrics import confusion_matrix\nw=load_wine(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev, X_final, y_dev, y_final = train_test_split(w.data,w.target,\n    test_size=.2,stratify=w.target,random_state=42)\nXtr,Xval,ytr,yval=train_test_split(X_dev,y_dev,stratify=y_dev,\n                                  test_size=.3,random_state=42)\nm=make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000)).fit(Xtr,ytr)\nprint('Confusion matrix:',confusion_matrix(yval,m.predict(Xval)))\np=permutation_importance(m,Xval,yval,n_repeats=10,random_state=42)\nprint('Top features:',sorted(zip(w.feature_names,p.importances_mean),\n                             key=lambda t:-t[1])[:5])",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n这段用辅助回归数据，按真实目标的四分位数事后分组诊断。分组信息用于评价而不作为预测输入；实际预测时未必已经知道目标值。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_diabetes\nfrom sklearn.linear_model import Ridge\nimport pandas as pd\nb=load_diabetes(as_frame=True)\nXtr,Xval,ytr,yval=train_test_split(b.data,b.target,test_size=.3,random_state=42)\nreg=Ridge(alpha=1.0).fit(Xtr,ytr)\ndf=pd.DataFrame({'target':yval.values,'residual':reg.predict(Xval)-yval.values})\ndf['group']=pd.qcut(df.target,4,labels=False)\nprint(df.groupby('group').residual.agg(['mean','median','std','count']))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch16_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第16章 模型解释、误差分析与科学结论\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n糖尿病随访数据（Diabetes）是一个明确命名的辅助回归案例：442名受试者的10项基线测量与一年后的疾病进展数值目标。默认特征已由来源作尺度处理，不是直接的原始化验单位。本例只演示回归计算，不作医学判断，也不把它称为住房数据。见正文5.6节。\n\n## 本次要理解什么\n误差分析解释哪些样本更容易出错；置换重要性衡量打乱一列后当前模型表现怎样变化。它们不是证明物理因果机制的方法。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 整体准确率与分组表现\n人工例子中常见组90条全部正确，稀有组10条只正确2条。先计算三个准确率，再判断只报告整体分数是否足够。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "print('整体准确率:',(90+2)/100)\nprint('常见组准确率:',90/90,'稀有组准确率:',2/10)\nprint('若原准确率.9，置换某列后.7，下降:',.9-.7)",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_wine\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.inspection import permutation_importance\nfrom sklearn.metrics import confusion_matrix\nw=load_wine(as_frame=True)\nfrom sklearn.model_selection import train_test_split\nX_dev, X_final, y_dev, y_final = train_test_split(w.data,w.target,\n    test_size=.2,stratify=w.target,random_state=42)\nXtr,Xval,ytr,yval=train_test_split(X_dev,y_dev,stratify=y_dev,\n                                  test_size=.3,random_state=42)\nm=make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000)).fit(Xtr,ytr)\nprint('Confusion matrix:',confusion_matrix(yval,m.predict(Xval)))\np=permutation_importance(m,Xval,yval,n_repeats=10,random_state=42)\nprint('Top features:',sorted(zip(w.feature_names,p.importances_mean),\n                             key=lambda t:-t[1])[:5])",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n这段用辅助回归数据，按真实目标的四分位数事后分组诊断。分组信息用于评价而不作为预测输入；实际预测时未必已经知道目标值。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "from sklearn.datasets import load_diabetes\nfrom sklearn.linear_model import Ridge\nimport pandas as pd\nb=load_diabetes(as_frame=True)\nXtr,Xval,ytr,yval=train_test_split(b.data,b.target,test_size=.3,random_state=42)\nreg=Ridge(alpha=1.0).fit(Xtr,ytr)\ndf=pd.DataFrame({'target':yval.values,'residual':reg.predict(Xval)-yval.values})\ndf['group']=pd.qcut(df.target,4,labels=False)\nprint(df.groupby('group').residual.agg(['mean','median','std','count']))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch17_student.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第17章 天文与物理综合项目\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n本Notebook用已介绍的葡萄酒数据演示完整报告流程，属于项目模板，不是已完成的天文或物理研究。真实项目要使用正文17章的对象、字段和划分要求；`scripts/run_science_csv.py`提供读取专业CSV的命令行起点。\n\n**版本：学生版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import pandas as pd\nfrom sklearn.datasets import load_wine\nfrom sklearn.model_selection import train_test_split,StratifiedKFold,cross_validate\nfrom sklearn.dummy import DummyClassifier\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.ensemble import RandomForestClassifier\nb=load_wine(as_frame=True)\nX_dev,X_final,y_dev,y_final=train_test_split(b.data,b.target,\n    stratify=b.target,test_size=.2,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nmodels={\n'dummy':DummyClassifier(strategy='most_frequent'),\n'logistic':make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000)),\n'forest':RandomForestClassifier(n_estimators=150,min_samples_leaf=2,random_state=42,n_jobs=1)}\nrows=[]\nfor name,est in models.items():\n    r=cross_validate(est,X_dev,y_dev,cv=cv)\n    rows.append({'model':name,'mean_score':r['test_score'].mean(),\n                 'std_score':r['test_score'].std()})\nprint(pd.DataFrame(rows).sort_values('mean_score',ascending=False))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n仅作为固定教学流程：本示例事先选择逻辑回归，再对保留部分评价一次。它不能替代新专业数据上的独立评价；禁止用这一分数再反复选模型。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "# For teaching, we preselect a simple, interpretable logistic model.\nselected=models['logistic'].fit(X_dev,y_dev)\nprint('One-time holdout accuracy:',selected.score(X_final,y_final))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      }
+    ]
+  },
+  "ch17_teacher.ipynb": {
+    "metadata": {
+      "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
+      },
+      "language_info": {
+        "name": "python"
+      },
+      "textbook_revision": "concepts-and-cases-v2"
+    },
+    "cells": [
+      {
+        "cell_type": "markdown",
+        "source": "# 第17章 天文与物理综合项目\n\n## 先认识对象和任务\n葡萄酒化学分析数据集（Wine）记录178个葡萄酒样本的13项测量指标，目标对应三个葡萄栽培品种的来源类别，不是质量评分或价格。每行是一份化学分析记录；酒精、苹果酸、颜色强度等列是输入。类别0、1、2分别有59、71、48条记录。字段名称和原资料未注明的单位见正文2.1节与 `data/field_dictionaries/wine.csv`。\n\n## 本次要理解什么\n本Notebook用已介绍的葡萄酒数据演示完整报告流程，属于项目模板，不是已完成的天文或物理研究。真实项目要使用正文17章的对象、字段和划分要求；`scripts/run_science_csv.py`提供读取专业CSV的命令行起点。\n\n**版本：教师版；概念与案例教学修订版。**",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 运行与阅读约定\n从第一格向后顺序运行；`print`显示结果。先写下自己的判断，再运行并解释差异。人工数据只用于说明机制。正文中的完整定义和数据来源仍需一起阅读。\n\n各章正式模型比较使用固定开发部分；最终保留部分不用于调参。前几章用于解释概念的小演示明确标为演示，不是最终科学性能。程序输出为本机实际计算结果，不是要求学生复现的固定最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 1\n运行前说明本段输入、使用的模型和输出含义；运行后记录一个可解释的变化。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "import pandas as pd\nfrom sklearn.datasets import load_wine\nfrom sklearn.model_selection import train_test_split,StratifiedKFold,cross_validate\nfrom sklearn.dummy import DummyClassifier\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.ensemble import RandomForestClassifier\nb=load_wine(as_frame=True)\nX_dev,X_final,y_dev,y_final=train_test_split(b.data,b.target,\n    stratify=b.target,test_size=.2,random_state=42)\ncv=StratifiedKFold(5,shuffle=True,random_state=7)\nmodels={\n'dummy':DummyClassifier(strategy='most_frequent'),\n'logistic':make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000)),\n'forest':RandomForestClassifier(n_estimators=150,min_samples_leaf=2,random_state=42,n_jobs=1)}\nrows=[]\nfor name,est in models.items():\n    r=cross_validate(est,X_dev,y_dev,cv=cv)\n    rows.append({'model':name,'mean_score':r['test_score'].mean(),\n                 'std_score':r['test_score'].std()})\nprint(pd.DataFrame(rows).sort_values('mean_score',ascending=False))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 实验步骤 2\n仅作为固定教学流程：本示例事先选择逻辑回归，再对保留部分评价一次。它不能替代新专业数据上的独立评价；禁止用这一分数再反复选模型。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "code",
+        "source": "# For teaching, we preselect a simple, interpretable logistic model.\nselected=models['logistic'].fit(X_dev,y_dev)\nprint('One-time holdout accuracy:',selected.score(X_final,y_final))",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 练习与结果记录\n1. 用自己的话说明本章模型怎样得到预测或分组。\n2. 解释一个手算例子与程序输出的对应关系。\n3. 改变一个参数或一个特征处理步骤，预测结果会怎样变化？先判断再验证。\n4. 迁移到天文或物理任务时，需要重新确认哪些数据含义和评价条件？\n\n提交一张结果表、一幅诊断图或一个完整计算，以及关于失败情形的解释。不能只报告最高分。",
+        "metadata": {}
+      },
+      {
+        "cell_type": "markdown",
+        "source": "## 教师核对与反馈\n与正文对应的完整习题参考答案见 `teacher_manual.pdf`；新增手算核对见 `scripts/check_worked_examples.py`。先请学生说明行、列和目标，再追问算法内部做了什么。\n\n评分时检查：概念是否清楚、操作的信息范围是否正确、结果是否按单位和任务解释、错误样本是否被讨论。程序运行成功不能代替这些判断。",
+        "metadata": {}
+      }
+    ]
+  }
+}

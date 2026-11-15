@@ -1,0 +1,10 @@
+{
+  "data_status": "synthetic physical teaching project",
+  "selected_model": "quadratic_ridge",
+  "development_records": 576,
+  "test_records": 144,
+  "development_groups": 72,
+  "test_groups": 18,
+  "test_RMSE_V": 0.14727685367549978,
+  "test_MAE_V": 0.11702221048926623
+}

@@ -1,0 +1,40 @@
+\chapter{Python、NumPy 与 Pandas 速查}
+本附录提供本书实验的最小预备知识。Python 在科学计算中承担数据读取、数组运算、训练与可视化。学生应能阅读变量赋值、函数调用、条件和循环，不需要先掌握完整的软件工程体系。
+\section{列表与数组}
+Python 列表可以保存多种对象。NumPy是Python数值计算软件包，数组是它用来存放规则数值集合的结构；程序中的np只是import时约定的简写。数组的形状表示各个轴的长度：一组100条、每条5个特征的数据通常形状是 $(100,5)$。数组 \texttt{X[:, 0]} 表示第一列；\texttt{X[0, :]} 表示第一行。监督学习目标常用一维数组 \texttt{y} 表示，长度应与样本行数一致。
+\begin{lstlisting}[caption={数组的形状、切片与基本统计}]
+import numpy as np
+X = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 8.0]])
+y = np.array([0, 0, 1])
+print(X.shape, y.shape)
+print(X[:, 0], X.mean(axis=0))
+\end{lstlisting}
+\section{DataFrame 的核心操作}
+Pandas是处理带行列标签表格的软件包，通常简写为\texttt{pd}。它的\texttt{DataFrame}是二维表，\texttt{Series}是一列或一组带索引的值。CSV是用分隔符组织字段的文本格式，\texttt{read\_csv}把文件读成表；它不会自动判断哪些字段是科学输入或目标。
+
+\texttt{DataFrame} 在保留列名、索引与类型方面非常方便。\texttt{df.loc} 按行列标签选择，\texttt{df.iloc} 按位置选择；\texttt{groupby} 用于分组统计；\texttt{merge} 可以连接表格，但必须检查连接键的唯一性与行数变化。科学对象的 ID 不应因为参与连接而被转换为有损浮点数。
+\begin{lstlisting}[caption={CSV 读取与字段检查}]
+import pandas as pd
+df = pd.read_csv("observations.csv")
+print(df.head(), df.dtypes)
+print(df.isna().sum())
+# Only select fields that are valid features at prediction time.
+X = df[["feature_1", "feature_2"]]
+\end{lstlisting}
+上面的字段名仅为模板，占位字段必须换成真实数据字典中的列。项目保存 CSV 时建议显式说明是否保留行索引；不要将 Pandas 自动索引与科学对象身份混为一谈。
+\section{绘图与随机数}
+Matplotlib 常用于绘制散点、直方图、损失曲线、混淆矩阵与残差。每幅科研图至少应有坐标名称、单位、样本范围和必要的图例。随机模拟使用 NumPy 的 \texttt{default\_rng(seed)}，训练与划分使用 sklearn 的 \texttt{random\_state}。种子可复现特定运行，但不代表结果在任何随机状态下都稳定。
+\begin{lstlisting}[caption={最小绘图示例}]
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+ax.scatter([1, 2, 3], [2, 2.5, 4])
+ax.set(xlabel="Input (unit)", ylabel="Target (unit)")
+fig.tight_layout()
+fig.savefig("scatter.pdf")
+\end{lstlisting}
+\section{Notebook 与脚本}
+Jupyter Notebook是一种把文字、代码和运行输出组织在多个单元中的交互文档。\textbf{内核}是实际执行代码并保存变量的进程。单元在页面上的先后不保证执行先后；因此后写的代码可能依赖一个已经在内存中、却没有出现在当前前文的变量。重启内核后从头运行，正是为了检查这类隐藏依赖。
+
+Notebook 适合交互探索，但发布前必须重启内核顺序执行，避免隐藏状态。数据下载、清洗和核心图表生成最好也保留普通 Python 脚本，便于批量核验。使用可复现路径和环境文件，避免在代码中写死作者个人电脑的绝对路径。
+
+\input{appendices/appendixA}

@@ -1,0 +1,254 @@
+{
+  "ch01_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "13b56b72bd5f4f83592ac45d97d16d5d241ee7dc6f39664c5244fb494096b0bc",
+    "seconds": 3.478
+  },
+  "ch01_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "13b56b72bd5f4f83592ac45d97d16d5d241ee7dc6f39664c5244fb494096b0bc",
+    "seconds": 2.524
+  },
+  "ch02_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "53fb64d94785c311341af79cd21de5ef6d099bebfe48832888f36db07c48c063",
+    "seconds": 2.63
+  },
+  "ch02_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "53fb64d94785c311341af79cd21de5ef6d099bebfe48832888f36db07c48c063",
+    "seconds": 2.846
+  },
+  "ch03_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "9c8c4d88b63a8016150703cbcd5f84f0bf5ffd5eeb11824f8ee26d7705a899ed",
+    "seconds": 2.991
+  },
+  "ch03_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "9c8c4d88b63a8016150703cbcd5f84f0bf5ffd5eeb11824f8ee26d7705a899ed",
+    "seconds": 3.287
+  },
+  "ch04_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "67fba1d3dfdfafa47e005c8430be757e8b2bd72e02092afd7b0f82c0a0a8b86b",
+    "seconds": 3.8
+  },
+  "ch04_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "67fba1d3dfdfafa47e005c8430be757e8b2bd72e02092afd7b0f82c0a0a8b86b",
+    "seconds": 3.472
+  },
+  "ch05_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "fa6324b0302ce31cb1f1e63f44585f727829fa6c42161cb253b4af2599b795c4",
+    "seconds": 3.57
+  },
+  "ch05_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "fa6324b0302ce31cb1f1e63f44585f727829fa6c42161cb253b4af2599b795c4",
+    "seconds": 3.594
+  },
+  "ch06_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "79c9919b1aa7afe22eb5907a7bad1ee52a02b5435fe1713bc283f380462ec600",
+    "seconds": 3.386
+  },
+  "ch06_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "79c9919b1aa7afe22eb5907a7bad1ee52a02b5435fe1713bc283f380462ec600",
+    "seconds": 3.672
+  },
+  "ch07_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "8d32c3c60b410a9b80c60d8162e32d2415341db44e4f922dee336aebb2012eae",
+    "seconds": 4.997
+  },
+  "ch07_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "8d32c3c60b410a9b80c60d8162e32d2415341db44e4f922dee336aebb2012eae",
+    "seconds": 4.078
+  },
+  "ch08_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "0b8705f2b3cb5fc0bd36521f517683eb3f49767d132473d49846abf8b19ec164",
+    "seconds": 4.401
+  },
+  "ch08_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "0b8705f2b3cb5fc0bd36521f517683eb3f49767d132473d49846abf8b19ec164",
+    "seconds": 4.276
+  },
+  "ch09_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "8dc88809927d33e9ab2538276e87eb4c32a370561114f5d47298c25961a53656",
+    "seconds": 7.147
+  },
+  "ch09_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "8dc88809927d33e9ab2538276e87eb4c32a370561114f5d47298c25961a53656",
+    "seconds": 6.934
+  },
+  "ch10_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "d46928418b0eae23cfba40a74ccb3ac696dac0e1a02c6ab27b05509e7aebddff",
+    "seconds": 4.871
+  },
+  "ch10_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "d46928418b0eae23cfba40a74ccb3ac696dac0e1a02c6ab27b05509e7aebddff",
+    "seconds": 4.294
+  },
+  "ch11_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "99cd6afd973260e8a7f8ffd0e791ade33cacf90130dbbb5511fe75e7ae38028e",
+    "seconds": 3.684
+  },
+  "ch11_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "99cd6afd973260e8a7f8ffd0e791ade33cacf90130dbbb5511fe75e7ae38028e",
+    "seconds": 4.191
+  },
+  "ch12_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "355b3a168777a58bf0a5d54d99e65461ffbc320852dc0c04a520dae2c511a23e",
+    "seconds": 4.396
+  },
+  "ch12_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "355b3a168777a58bf0a5d54d99e65461ffbc320852dc0c04a520dae2c511a23e",
+    "seconds": 4.187
+  },
+  "ch13_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "9058a6ecfcab6754e5a8ba3c8517b0a69d3897f842d5ef25983e9a46d9113370",
+    "seconds": 4.548
+  },
+  "ch13_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "9058a6ecfcab6754e5a8ba3c8517b0a69d3897f842d5ef25983e9a46d9113370",
+    "seconds": 3.753
+  },
+  "ch14_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "b34d91f5873b3cd9d8df77f00947329e086d171d05f9d20817cd50414a71e54f",
+    "seconds": 4.015
+  },
+  "ch14_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "b34d91f5873b3cd9d8df77f00947329e086d171d05f9d20817cd50414a71e54f",
+    "seconds": 3.915
+  },
+  "ch15_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "0bc382fe42ad6552ad4d84e1b945bfa4ea5dd9665991252070324f6b954ac488",
+    "seconds": 3.736
+  },
+  "ch15_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "0bc382fe42ad6552ad4d84e1b945bfa4ea5dd9665991252070324f6b954ac488",
+    "seconds": 3.553
+  },
+  "ch16_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "01e6141fc081ffef176636fd6b237efd4a443f1af3bb6d518f60cf6df21bbc00",
+    "seconds": 4.6
+  },
+  "ch16_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "01e6141fc081ffef176636fd6b237efd4a443f1af3bb6d518f60cf6df21bbc00",
+    "seconds": 3.726
+  },
+  "ch17_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "6b5417b17a629d8acecc7d36452d5ce211bc59098245b5009d759a435db3397b",
+    "seconds": 4.189
+  },
+  "ch17_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "6b5417b17a629d8acecc7d36452d5ce211bc59098245b5009d759a435db3397b",
+    "seconds": 3.934
+  },
+  "project_ogle_student.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "248492d3bbb231b7be7d6cd7356626e58070b235d308aab4fc0cec73627d820b",
+    "seconds": 3.689
+  },
+  "project_ogle_teacher.ipynb": {
+    "status": "passed",
+    "kernel": "fresh python3",
+    "code_cells": 4,
+    "code_sha256": "248492d3bbb231b7be7d6cd7356626e58070b235d308aab4fc0cec73627d820b",
+    "seconds": 3.959
+  }
+}

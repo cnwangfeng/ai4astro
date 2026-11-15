@@ -1,0 +1,12 @@
+﻿field,meaning_zh,unit_or_scale,role,source_note
+age,年龄,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+sex,性别编码,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+bmi,体质指数,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+bp,平均血压,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+s1,总血清胆固醇,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+s2,低密度脂蛋白,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+s3,高密度脂蛋白,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+s4,总胆固醇/高密度脂蛋白比值,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+s5,血清甘油三酯的对数,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+s6,血糖,默认scaled=True已中心化并按标准差×sqrt(n)缩放；不标成原始单位,feature,scikit-learn 官方数据说明；实际导出版本 1.8.0
+target,基线一年后疾病进展的数值测量；辅助回归演示,来源定义的进展数值尺度；不是房价,target,scikit-learn 官方数据说明；实际导出版本 1.8.0
