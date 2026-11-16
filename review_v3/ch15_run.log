@@ -1,6 +1,0 @@
- reference_quantile  threshold  candidates  precision  recall  normal_false_positive_rate
-               0.90   0.550333          40   0.500000     1.0                       0.100
-               0.95   0.592046          29   0.689655     1.0                       0.045
-               0.99   0.668462          20   1.000000     1.0                       0.000
-
-STDERR

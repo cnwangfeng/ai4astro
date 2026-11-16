@@ -1,8 +1,0 @@
-          model  CV_RMSE_V  fold_std_V
-           mean   6.759366    0.495449
-         linear   0.586874    0.061920
-quadratic_ridge   0.143956    0.017020
-         forest   0.330718    0.062093
-{'data_status': 'synthetic physical teaching project', 'selected_model': 'quadratic_ridge', 'development_records': 576, 'test_records': 144, 'development_groups': 72, 'test_groups': 18, 'test_RMSE_V': np.float64(0.14727685367549978), 'test_MAE_V': np.float64(0.11702221048926623)}
-
-STDERR
