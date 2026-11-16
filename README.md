@@ -76,10 +76,10 @@ python scripts/audit_structure_v3.py   # 17 章/119 节/D 题/引用完整性断
 1. 鸢尾花、葡萄酒、手写数字为 sklearn 公开标准数据，配有 CSV，可离线运行；
 2. `data/ogle_lmc_f_excerpt.csv` 是真实 OGLE 目录（OCVS cepF.dat）前 90 条固定规则的少字段节选，来源、字段、缺失与限制见 `data/OGLE_excerpt_README.md`。87 条可用记录的模型比较与保留集评价已实际运行。**它不是完整巡天样本，也不是新的周期—光度标定**；
 3. 教学中使用的生成数据均明确标注"人工构造/模拟"，不伪装成真实观测或仪器数据；
-4. California Housing、完整 OGLE、SDSS、Gaia、Airfoil、Sonar、超导材料等外部数据不随仓库分发。需联网获取时运行 `python scripts/fetch_external_data.py --dataset <名称>`（失败即报错，不回退为其他数据）。相关章节提供背景、字段与任务设计；**未完成的部分如实标注，不用其他数据填补或伪造实验分数**。
+4. California Housing、完整 OGLE、SDSS、Gaia、Airfoil、Sonar、超导材料等外部数据不随仓库分发。需联网获取时运行 `python scripts/fetch_external_data.py --dataset <名称>`（失败即报错，不回退为其他数据）。相关章节提供背景、字段与任务设计。
 
 ## 深化要点与边界
 
 - 全部 17 章包含机制解释、必要推导、可算例子与可检验任务；第 8 章决策树为重写版（候选全枚举、n·ΔV=SSE 恒等式、代价复杂度剪枝）；
 - 每章 4 道共 68 道 D 编号深化题，教师手册（`docs/teacher_manual.tex`）逐题给出计算与分析参考；
-- 本书尚未经过独立的交叉学术审稿与真实课堂试教；实验通过不等于所有科研结论成立。使用中如发现问题，欢迎提出。
+- 由于作者水平有限，本书使用中如发现问题，欢迎提出。
